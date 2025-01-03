@@ -1,0 +1,103 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider          = "postgresql"
+  url               = env("DATABASE_URL")
+  shadowDatabaseUrl = "postgresql://neondb_owner:YFphr2EP8SHx@ep-green-block-a1jbwxl4-pooler.ap-southeast-1.aws.neon.tech/prisma_migrate_shadow_db_87b68c1b-3067-454d-8391-b2d168d1ff95?sslmode=require"
+}
+
+model User {
+  userId       String    @id @default(uuid())
+  password     String
+  employeeId   String    @unique
+  username     String    @default("")
+  permissions  String[]  @default([])
+  email        String    @default("test@gmail.com")
+  comments     Comment[]
+  tasks        Task[]    @relation("assignedTasks")
+  createdTasks Task[]    @relation("createdTasks")
+  teams        Team[]    @relation("teamMembers")
+  teamLeader   Team[]    @relation("teamLeader")
+}
+
+model Session {
+  sessionId   String    @id @default(uuid())
+  title       String
+  description String
+  date        DateTime
+  startTime   DateTime
+  endTime     DateTime
+  location    String    @default("Google Meet")
+  teamId      String
+  team        Team      @relation("session-relation-team", fields: [teamId], references: [teamId])
+  eventType   EventType
+}
+
+model Club {
+  clubId   String @id @default(uuid())
+  clubName String
+  teams    Team[] @relation("clubTeam")
+}
+
+model Team {
+  teamId   String    @id @default(uuid())
+  name     String
+  leaderId String?
+  tasks    Task[]    @relation("teamTasks")
+  members  User[]    @relation("teamMembers")
+  sessions Session[] @relation("session-relation-team")
+  leaders  User[]     @relation("teamLeader")
+  clubId   String
+  club     Club      @relation("clubTeam", fields: [clubId], references: [clubId])
+}
+
+model Task {
+  taskId      String    @id @default(uuid())
+  title       String
+  description String
+  createdById String
+  deadline    DateTime
+  status      Status
+  assigneeId  String
+  teamId      String?
+  comments    Comment[]
+  assignee    User      @relation("assignedTasks", fields: [assigneeId], references: [userId])
+  user        User      @relation("createdTasks", fields: [createdById], references: [userId])
+  team        Team?     @relation("teamTasks", fields: [teamId], references: [teamId])
+}
+
+model Comment {
+  commentId String   @id @default(uuid())
+  content   String
+  taskId    String
+  authorId  String
+  createdAt DateTime @default(now())
+  author    User     @relation(fields: [authorId], references: [userId])
+  task      Task     @relation(fields: [taskId], references: [taskId], onDelete: Cascade)
+}
+
+model Message {
+  id        Int      @id @default(autoincrement())
+  content   String
+  sender    String
+  createdAt DateTime @default(now())
+}
+
+enum Role {
+  ADMIN
+  LEADER
+  MEMBER
+}
+
+enum Status {
+  PENDING
+  INPROGRESS
+  COMPLETED
+}
+
+enum EventType {
+  ONLINE
+  INPERSON
+}
