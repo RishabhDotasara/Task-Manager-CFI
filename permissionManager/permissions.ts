@@ -13,6 +13,7 @@ export const permissions = {
     read: (teamId: string) => `team:read:${teamId}`,
     update: (teamId: string) => `team:update:${teamId}`,
     delete: (teamId: string) => `team:delete:${teamId}`,
+    visible: "team:visible",
     readAll: "team:readAll", // For admins
   },
   admin:{
@@ -36,7 +37,6 @@ export const defaultPermissions = (teamIds: string[]) => ({
   MEMBER: teamIds.flatMap((teamId) => [
     permissions.task.read(teamId),
     permissions.task.update(teamId),
-    permissions.task.readAll(teamId),
     permissions.team.read(teamId),
   ]),
   TEAMLEADER: teamIds.flatMap((teamId) => [
@@ -44,7 +44,11 @@ export const defaultPermissions = (teamIds: string[]) => ({
     permissions.task.create(teamId),
     permissions.task.delete(teamId),
     permissions.team.update(teamId),
+    permissions.team.visible
   ]),
+  CLUBLEADER: [
+    permissions.team.create
+  ]
 });
 
 // Check Permissions

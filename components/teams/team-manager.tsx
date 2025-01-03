@@ -25,7 +25,9 @@ const limit = 5;
 
 export default function TeamManagementPage() {
   const userPermissions = useRecoilValue(permissionAtom);
-  const [editingTeam, setEditingTeam] = useState<Team | null>(null);
+  const [editingTeam, setEditingTeam] = useState<
+    (Team & { leaders: User[]; members: User[] }) | null
+  >(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
@@ -36,9 +38,34 @@ export default function TeamManagementPage() {
   const queryClient = useQueryClient();
 
   const handleUpdateTeam = async (data: any) => {
+    console.log(data);
+
+    const oldMembers = editingTeam?.members.map(
+      (member: User) => member.userId
+    );
+    const oldLeaders = editingTeam?.leaders.map(
+      (leader: User) => leader.userId
+    );
+    const newMembers = data.members.map((memberId: string) => {
+      if (!oldMembers?.includes(memberId)) {
+        return memberId;
+      }
+    });
+    const newLeaders = data.leaders.map((leaderId: string) => {
+      if (!oldLeaders?.includes(leaderId)) {
+        return leaderId;
+      }
+    });
+
     const response = await fetch("/api/teams/update", {
       method: "POST",
-      body: JSON.stringify({ ...data, teamId: editingTeam?.teamId }),
+      body: JSON.stringify({
+        ...data,
+        teamId: editingTeam?.teamId,
+        newMembers,
+        newLeaders,
+        promoterId: session.data?.userId
+      }),
     });
   };
 
@@ -93,7 +120,7 @@ export default function TeamManagementPage() {
       const response = await fetch("/api/user/getAll");
       if (response.ok) {
         const data = await response.json();
-        return data;
+        return data.users;
       }
     } catch (err) {
       console.error(err);
@@ -157,9 +184,9 @@ export default function TeamManagementPage() {
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-xl font-semibold">Existing Teams</h2>
             <div className="flex gap-4">
-              {hasPermission(userPermissions, permissions.team.create) && (
+              {/* {hasPermission(userPermissions, permissions.team.create) && (
                 <CreateClubDialog />
-              )}
+              )} */}
               {hasPermission(userPermissions, permissions.team.create) && (
                 <CreateTeamDialog />
               )}

@@ -17,7 +17,7 @@ export async function GET(request: Request) {
 
     await prisma.$disconnect();
 
-    return NextResponse.json(users, { status: 200 });
+    return NextResponse.json({users}, { status: 200 });
   } catch (err) {
     console.log("ERROR fetching users:", err);
     return NextResponse.json(

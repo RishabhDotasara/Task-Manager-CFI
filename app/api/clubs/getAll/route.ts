@@ -4,7 +4,11 @@ import { NextRequest, NextResponse } from "next/server";
 export async function GET(req: NextRequest) {
   try {
     const prisma = new PrismaClient();
-    const clubs = await prisma.club.findMany();
+    const clubs = await prisma.club.findMany({
+      include: {
+        clubLeads: true,
+      },
+    });
     await prisma.$disconnect();
     return NextResponse.json({ clubs }, { status: 200 });
   } catch (err) {

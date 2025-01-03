@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { Bell, FileText, List, PresentationIcon, Shield } from "lucide-react";
+import { Bell, FileText, List, NetworkIcon, PresentationIcon, Shield } from "lucide-react";
 import { FaPeopleCarry, FaTasks } from "react-icons/fa";
 import { ChatBubbleIcon } from "@radix-ui/react-icons";
 import HasPermission from "../permissions/HasPermission";
@@ -33,7 +33,7 @@ export function NavigationLinks({
       
 
       
-      {<Link
+      {hasPermission(userPermissions, permissions.team.visible) && <Link
           href="/teams"
           className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
         >
@@ -48,6 +48,15 @@ export function NavigationLinks({
         >
           <Shield className={iconClassName} />
           Manage Admins
+        </Link>
+      }
+
+      {hasPermission(userPermissions, permissions.admin.admin) && <Link
+          href="/clubs-manager"
+          className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
+        >
+          <NetworkIcon className={iconClassName} />
+          Manage Clubs
         </Link>
       }
 

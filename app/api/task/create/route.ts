@@ -1,14 +1,25 @@
-import { PrismaClient } from "@prisma/client";
+import { generateNotification } from "@/lib/notifications/serverFns";
+import { PrismaClient, Status, Task } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 
-const getTask = (id:string, body:any)=>{
+interface ReturnTask {
+  title:string,
+  description:string,
+  createdById:string,
+  assigneeId: string,
+  deadline: string,
+  status: Status,
+  teamId: string
+}
+
+const getTask = (id:string, body:any) : ReturnTask=>{
   return {
       title: body.title,
       description: body.description,
-      createdById: body.createdById, // Ensure this matches the name used in the body
+      createdById: body.createdById, 
       assigneeId: id,
       deadline: body.deadline,
-      status: "PENDING", // Assuming you have a status field
+      status: Status.PENDING,
       teamId: body.teamId,
   }
 }
@@ -22,6 +33,18 @@ export async function POST(request: NextRequest) {
     const task = await prisma.task.createMany({
       data:dataToCreateTasks,
     });
+
+    dataToCreateTasks.map(async (task:Task)=>{
+      await generateNotification({
+        title:`New Task`,
+        message: `New Task Assigned: "${task.title}"`,
+        actionUrl: "",
+        receiverId: task.assigneeId,
+        senderId: task.createdById,
+        toKeep: true,
+        type: "TASK"
+      })
+    })
 
     return NextResponse.json({ message: "Task created and assigned!", task }, { status: 200 });
   } catch (err) {

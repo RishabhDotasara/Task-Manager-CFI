@@ -1,4 +1,5 @@
-import { PrismaClient } from "@prisma/client";
+import { generateNotification } from "@/lib/notifications/serverFns";
+import { PrismaClient, Status } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 
 
@@ -9,7 +10,7 @@ export async function POST(request:NextRequest)
         const prisma = new PrismaClient();
         const body = await request.json();
 
-        await prisma.task.update({
+        const task = await prisma.task.update({
             where:{
                 taskId:body.taskId
             },
@@ -17,6 +18,19 @@ export async function POST(request:NextRequest)
                 status:body.status
             }
         })
+        console.log(body.status)
+        if(body.status == Status.COMPLETED)
+        {
+            await generateNotification({
+                title: "Task Completed",
+                message: `Task "${task.title}" has been completed.`,
+                actionUrl:"",
+                receiverId: task.createdById,
+                senderId: task.assigneeId,
+                toKeep: false,
+                type: "UPDATE"
+            })
+        }
         return NextResponse.json({message:"Status updated!"}, {status:200})
         
     }

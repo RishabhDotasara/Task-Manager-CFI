@@ -24,7 +24,7 @@ export async function GET(req: NextRequest) {
         }
       }
     })
-    console.log(teams);
+    // console.log(teams);
     await prisma.$disconnect();
     return NextResponse.json(
       { teams:teams || [], message: "Teams Fetched by LeaderId " + leaderId },

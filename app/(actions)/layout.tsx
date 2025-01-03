@@ -18,6 +18,8 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools/build/modern/
 import { Team, User } from "@prisma/client";
 import { permissionAtom } from "@/states/permissionAtom";
 import { getDynamicPermissions } from "@/permissionManager/permissions";
+import { NotificationPopover } from "@/components/notifications/NotificationPopOver";
+import { notificationAtom } from "@/states/notificationAtom";
 
 export default function DashboardLayout({
   children,
@@ -32,7 +34,8 @@ export default function DashboardLayout({
   const [currentTeam, setCurrentTeam] = useRecoilState(teamAtom);
   const [isLoading, setIsLoading] = useState(false);
   const [permission, setPermissions] = useRecoilState(permissionAtom);
-
+  const [notifications, setNotifications] = useRecoilState(notificationAtom)
+ 
   //also fetch the user and store the permissions in the permissionsAtom
   const fetchUser = async () => {
     try {
@@ -49,11 +52,13 @@ export default function DashboardLayout({
           data.user.teamLeader
         );
         console.log("Generated Permissions: ", generatedPermissions);
-        setPermissions([...data.user.permissions,...(generatedPermissions || [])]);
+        setPermissions([
+          ...data.user.permissions,
+          ...(generatedPermissions || []),
+        ]);
         setTeams(data.user.teams);
-        if (data.user.teams.length > 0 )
-        {
-          setCurrentTeam(data.user.teams[0].teamId)
+        if (data.user.teams.length > 0) {
+          setCurrentTeam(data.user.teams[0].teamId);
         }
         return data.user;
       }
@@ -66,11 +71,39 @@ export default function DashboardLayout({
     }
   };
 
+  const fetchNotifications = async ()=>{
+    try 
+    {
+      const response = await fetch(`/api/notification/getAll?userId=${session.data?.userId}`);
+      const data = await response.json()
+      setNotifications(data.notifications)
+      return data.notifications
+    }
+    catch(err)
+    {
+      console.log(err)
+      toast({
+        title:"Error Fetching Notifications!",
+        description:"Try Again!",
+        variant:"destructive"
+      })
+    }
+  }
+
   const userQuery = useQuery({
     queryKey: ["user", session.data?.userId],
     queryFn: fetchUser,
     staleTime: 1000 * 60 * 5,
+    refetchInterval: 1000 * 60 * 5,
   });
+
+  const notificationsQuery = useQuery({
+    queryKey:['notifications', session.data?.userId],
+    queryFn:fetchNotifications,
+    staleTime: 5 * 60 * 1000,
+    refetchInterval: 5 * 60 * 1000,
+    
+  })
 
   useEffect(() => {
     if (session.status === "unauthenticated") {
@@ -129,10 +162,9 @@ export default function DashboardLayout({
                   Try Again!
                 </Button>
               )}
-              <Button variant="outline" size="icon" className="ml-auto h-8 w-8">
-                <Bell className="h-4 w-4" />
-                <span className="sr-only">Toggle notifications</span>
-              </Button>
+              <div className="p-2">
+                <NotificationPopover />
+              </div>
             </div>
             <div className="flex-1 px-2 lg:px-4">
               <NavigationLinks />
@@ -155,22 +187,22 @@ export default function DashboardLayout({
                 </Button>
               </SheetTrigger>
               <SheetContent side="left" className="flex flex-col bg-background">
-                <TeamSelector
-                  teams={teams || []}
-                  currentTeam={currentTeam}
-                  onTeamChange={setCurrentTeam}
-                />
-                <NavigationLinks
-                  role={session.data?.role}
-                  className="mt-4"
-                  iconClassName="h-5 w-5"
-                />
+                <div className="flex gap-2 items-center">
+                  <TeamSelector
+                    teams={teams || []}
+                    currentTeam={currentTeam}
+                    onTeamChange={setCurrentTeam}
+                  />
+
+                  <NotificationPopover />
+                </div>
+                <NavigationLinks className="mt-4" iconClassName="h-5 w-5" />
               </SheetContent>
             </Sheet>
             <div className="w-full flex-1">
               <ModeToggle />
             </div>
-            <UserMenu role={session.data?.role} onLogout={handleLogOut} />
+            <UserMenu onLogout={handleLogOut} />
           </header>
           <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6 bg-background">
             <div className="flex flex-1 justify-center rounded-lg shadow-sm">
