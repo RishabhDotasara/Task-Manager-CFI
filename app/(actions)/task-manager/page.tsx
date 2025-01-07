@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useSession } from "next-auth/react";
-import { Cross, Loader, X } from "lucide-react";
+import { AlertCircle, CheckCircle2, Clock, Cross, Loader, X } from "lucide-react";
 import { Task, User } from "@prisma/client";
 import { useToast } from "@/hooks/use-toast";
 import TaskDialog from "@/components/add-task";
@@ -45,6 +45,9 @@ import { Session } from "next-auth";
 import { hasPermission, permissions } from "@/permissionManager/permissions";
 import HasPermission from "@/components/permissions/HasPermission";
 import { permissionAtom } from "@/states/permissionAtom";
+import TaskStatusCard from "@/components/taskManagerDashboard/TaskStatusCard";
+import TaskFilters from "@/components/taskManagerDashboard/TaskFilters";
+import TaskList from "@/components/taskManagerDashboard/TaskList";
 
 const statusColors = {
   PENDING: "bg-red-500 text-white",
@@ -83,14 +86,7 @@ export default function HomePage() {
         `/api/task/getAll?teamId=${currentTeamId}`,
         `/api/task/getAll?assigneeId=${session.data?.userId}&teamId=${currentTeamId}`,
       ];
-      const response = await fetch(
-        (await hasPermission(
-          userPermissions,
-          permissions.task.readAll(currentTeamId)
-        ))
-          ? urls[0]
-          : urls[1]
-      );
+      const response = await fetch(urls[0]);
       //set all filters to default
       setUserToFilter("");
       setStatusToFilter("");
@@ -205,31 +201,17 @@ export default function HomePage() {
     filterTasks();
   }, [userToFilter, statusToFilter, deadlineFilter, tasksQuery.data]);
 
-  const chartData = useMemo(() => {
-    return [
-      {
-        status: "PENDING",
-        count: filteredTasks.filter((task: Task) => task.status === "PENDING")
-          .length,
-      },
-      {
-        status: "INPROGRESS",
-        count: filteredTasks.filter(
-          (task: Task) => task.status === "INPROGRESS"
-        ).length,
-      },
-      {
-        status: "COMPLETED",
-        count: filteredTasks.filter((task: Task) => task.status === "COMPLETED")
-          .length,
-      },
-    ];
-  }, [filteredTasks]);
 
   const clearFilters = () => {
     setUserToFilter("");
     setStatusToFilter("");
     setDeadlineFilter("all");
+  };
+
+  const taskStats = {
+    pending: filteredTasks.filter((task: Task) => task.status === "PENDING").length,
+    inProgress: filteredTasks.filter((task: Task) => task.status === "INPROGRESS").length,
+    completed: filteredTasks.filter((task: Task) => task.status === "COMPLETED").length,
   };
 
   if (tasksQuery.isError) {
@@ -243,192 +225,64 @@ export default function HomePage() {
   }
 
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-6">Your Tasks</h1>
-
-      <div className="grid gap-6 md:grid-cols-2">
-        <Card className="h-fit">
-          <CardHeader>
-            <CardTitle>Task Overview</CardTitle>
-
-            <CardDescription>
-              Your current tasks and their statuses
-            </CardDescription>
-          
-              {(session.status == "authenticated" && hasPermission(userPermissions, permissions.task.create(currentTeamId))) && (
-                <TaskDialog
-                  trigger={<Button variant="outline">Add Task</Button>}
-                  triggerFunc={fetchTasks}
-                  tasks={tasksQuery.data as Task[]}
-                  all={usersQuery.data || []}
-                />
-              )}
-           
-          </CardHeader>
-          <CardContent>
-            {tasksQuery.isLoading ? (
-              <Skeleton className="w-full h-[300px]" />
-            ) : (
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={chartData}>
-                  <XAxis dataKey="status" />
-                  <YAxis />
-                  <Tooltip />
-                  <Bar dataKey="count">
-                    {chartData.map((entry, index) => (
-                      <Cell
-                        key={`cell-${index}`}
-                        fill={
-                          chartColors[entry.status as keyof typeof chartColors]
-                        }
-                      />
-                    ))}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
-            )}
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Task List</CardTitle>
-            <CardDescription>Tasks To Work On</CardDescription>
-            <div className="space-y-4">
-              <div className="flex flex-wrap gap-2">
-                
-                  {hasPermission(userPermissions, permissions.task.readAll(currentTeamId)) && session.status == "authenticated" && (
-                    <Select
-                      onValueChange={(value) => setUserToFilter(value)}
-                      value={userToFilter}
-                    >
-                      <SelectTrigger className="w-[180px]">
-                        <SelectValue placeholder="Filter by user" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectGroup>
-                          <SelectLabel>Assigned To</SelectLabel>
-                          {(usersQuery.data || []).map((user: User) => (
-                            <SelectItem key={user.userId} value={user.userId}>
-                              {user.username} | {user.employeeId.toUpperCase()}
-                            </SelectItem>
-                          ))}
-                        </SelectGroup>
-                      </SelectContent>
-                    </Select>
-                  )}
-                
-
-                <Select
-                  onValueChange={(value) => setStatusToFilter(value)}
-                  value={statusToFilter}
-                >
-                  <SelectTrigger className="w-[180px]">
-                    <SelectValue placeholder="Filter by status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectGroup>
-                      <SelectLabel>Status</SelectLabel>
-                      {Object.keys(statusColors).map((status) => (
-                        <SelectItem key={status} value={status}>
-                          {status}
-                        </SelectItem>
-                      ))}
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
-
-                <Select
-                  onValueChange={(value) => setDeadlineFilter(value)}
-                  value={deadlineFilter}
-                >
-                  <SelectTrigger className="w-[180px]">
-                    <SelectValue placeholder="Filter by deadline" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectGroup>
-                      <SelectLabel>Deadline</SelectLabel>
-                      {Object.entries(deadlineRanges).map(([value, label]) => (
-                        <SelectItem key={value} value={value}>
-                          {label}
-                        </SelectItem>
-                      ))}
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
-
-                {(userToFilter ||
-                  statusToFilter ||
-                  deadlineFilter !== "all") && (
-                  <Button
-                    variant="outline"
-                    onClick={clearFilters}
-                    className="flex items-center gap-2"
-                  >
-                    <X className="h-4 w-4" />
-                    Clear Filters
-                  </Button>
-                )}
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <ScrollArea className="h-[300px] w-full rounded-md border overflow-y-auto p-2">
-              {tasksQuery.isLoading ? (
-                <div className="space-y-2">
-                  {[...Array(5)].map((_, index) => (
-                    <Skeleton key={index} className="w-full h-16" />
-                  ))}
-                </div>
-              ) : (
-                <ul className="space-y-4 overflow-auto">
-                  {filteredTasks.length === 0 && (
-                    <div className="text-center text-muted-foreground py-8">
-                      No tasks match the selected filters
-                    </div>
-                  )}
-                  {filteredTasks.map((task: Task) => (
-                    <li
-                      key={task.taskId}
-                      className="flex items-center justify-between p-2 bg-accent rounded-lg"
-                    >
-                      <div>
-                        <Link
-                          href={`/task-manager/task/${task.taskId}`}
-                          className="font-semibold hover:underline"
-                        >
-                          {task.title}
-                        </Link>
-                        <p className="text-sm text-muted-foreground">
-                          <span className="mr-8">
-                            Assigned to: {(task as any).assignee.username}
-                          </span>
-                          <span>
-                            Time Left:{" "}
-                            {Math.ceil(
-                              (new Date(task.deadline).getTime() -
-                                new Date().getTime()) /
-                                (1000 * 60 * 60 * 24)
-                            )}{" "}
-                            day(s)
-                          </span>
-                        </p>
-                      </div>
-                      <Badge
-                        className={
-                          statusColors[task.status as keyof typeof statusColors]
-                        }
-                      >
-                        {task.status}
-                      </Badge>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </ScrollArea>
-          </CardContent>
-        </Card>
+    <div className="container mx-auto p-4 space-y-6">
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold">Your Tasks</h1>
+        {session.status === "authenticated" &&
+          hasPermission(userPermissions, permissions.task.create(currentTeamId)) && (
+            <TaskDialog
+              trigger={<Button>Add Task</Button>}
+              triggerFunc={fetchTasks}
+              tasks={tasksQuery.data as Task[]}
+              all={usersQuery.data || []}
+            />
+          )}
       </div>
+
+      <div className="grid gap-4 md:grid-cols-3">
+        <TaskStatusCard
+          status="Pending Tasks"
+          count={taskStats.pending}
+          icon={<AlertCircle className="h-6 w-6 text-red-500" />}
+          description="Tasks waiting to be started"
+        />
+        <TaskStatusCard
+          status="In Progress"
+          count={taskStats.inProgress}
+          icon={<Clock className="h-6 w-6 text-yellow-500" />}
+          description="Tasks currently being worked on"
+        />
+        <TaskStatusCard
+          status="Completed"
+          count={taskStats.completed}
+          icon={<CheckCircle2 className="h-6 w-6 text-green-500" />}
+          description="Successfully completed tasks"
+        />
+      </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Task List</CardTitle>
+          <CardDescription>Manage and track your tasks</CardDescription>
+          <TaskFilters
+            users={usersQuery.data || []}
+            userToFilter={userToFilter}
+            statusToFilter={statusToFilter}
+            deadlineFilter={deadlineFilter}
+            onUserFilterChange={setUserToFilter}
+            onStatusFilterChange={setStatusToFilter}
+            onDeadlineFilterChange={setDeadlineFilter}
+            onClearFilters={clearFilters}
+            showUserFilter={
+              session.status === "authenticated" &&
+              hasPermission(userPermissions, permissions.task.readAll(currentTeamId))
+            }
+          />
+        </CardHeader>
+        <CardContent>
+          <TaskList tasks={filteredTasks} isLoading={tasksQuery.isLoading} />
+        </CardContent>
+      </Card>
     </div>
   );
 }

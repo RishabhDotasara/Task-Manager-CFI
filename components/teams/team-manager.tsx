@@ -20,6 +20,8 @@ import { hasPermission, permissions } from "@/permissionManager/permissions";
 import { useRecoilValue } from "recoil";
 import { permissionAtom } from "@/states/permissionAtom";
 import { CreateClubDialog } from "../clubs/CreateClubDialog";
+import useAllUsersQuery from "@/hooks/use-allusers";
+import ReloadButton from "../ReloadButton";
 
 const limit = 5;
 
@@ -34,7 +36,7 @@ export default function TeamManagementPage() {
   const session = useSession();
   const { toast } = useToast();
   const [page, setPage] = useState(1);
-
+  const {allUsersQuery} = useAllUsersQuery()
   const queryClient = useQueryClient();
 
   const handleUpdateTeam = async (data: any) => {
@@ -64,27 +66,9 @@ export default function TeamManagementPage() {
         teamId: editingTeam?.teamId,
         newMembers,
         newLeaders,
-        promoterId: session.data?.userId
+        promoterId: session.data?.userId,
       }),
     });
-  };
-
-  const handleDeleteTeam = async (teamId: string) => {
-    try {
-      setIsDeleting(true);
-      const response = await fetch(`/api/teams/delete?teamId=${teamId}`);
-      if (response.ok) {
-        toast({ title: "Team Deleted!" });
-      }
-    } catch (err) {
-      console.error(err);
-      toast({
-        title: "Failed to delete team",
-        variant: "destructive",
-      });
-    } finally {
-      setIsDeleting(false);
-    }
   };
 
   const fetchTeams = async () => {
@@ -94,11 +78,7 @@ export default function TeamManagementPage() {
         leader: `/api/teams/get-teams-by-leader?leaderId=${session.data?.userId}&page=${page}&limit=${limit}`,
         admin: `/api/teams/getAll?page=${page}&limit=${limit}`,
       };
-      const response = await fetch(
-        hasPermission(userPermissions, permissions.team.readAll)
-          ? urls.admin
-          : urls.leader
-      );
+      const response = await fetch(urls.leader);
       if (response.ok) {
         const data = await response.json();
         console.log(data);
@@ -115,21 +95,6 @@ export default function TeamManagementPage() {
     }
   };
 
-  const fetchUsers = async () => {
-    try {
-      const response = await fetch("/api/user/getAll");
-      if (response.ok) {
-        const data = await response.json();
-        return data.users;
-      }
-    } catch (err) {
-      console.error(err);
-      toast({
-        title: "Failed to fetch users",
-        variant: "destructive",
-      });
-    }
-  };
 
   const fetchTeamsQuery = useQuery({
     queryKey: ["teams", "all", page],
@@ -138,12 +103,7 @@ export default function TeamManagementPage() {
     enabled: Boolean(session.data?.userId) && Boolean(page),
   });
 
-  const allUsersQuery = useQuery({
-    queryKey: ["users", "all"],
-    queryFn: fetchUsers,
-    staleTime: 5 * 60 * 1000,
-    enabled: Boolean(fetchTeamsQuery.data),
-  });
+
 
   const updateTeamMutation = useMutation({
     mutationKey: ["updateTeam", editingTeam?.teamId],
@@ -178,25 +138,17 @@ export default function TeamManagementPage() {
       <Card className="mb-8">
         <CardHeader>
           <CardTitle>Team Management</CardTitle>
-          <CardDescription>Manage your organization's teams</CardDescription>
+          <CardDescription>Manage your teams</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-xl font-semibold">Existing Teams</h2>
-            <div className="flex gap-4">
-              {/* {hasPermission(userPermissions, permissions.team.create) && (
-                <CreateClubDialog />
-              )} */}
-              {hasPermission(userPermissions, permissions.team.create) && (
-                <CreateTeamDialog />
-              )}
-            </div>
+            <ReloadButton onRefetch={fetchTeamsQuery.refetch} isRefetching={fetchTeamsQuery.isRefetching}/>
           </div>
           <TeamTable
             isLoading={fetchTeamsQuery.isLoading}
             teams={fetchTeamsQuery.data || []}
             onEdit={setEditingTeam}
-            onDelete={handleDeleteTeam}
             isDeleting={isDeleting}
             userId={session.data?.userId}
             setCurrentPage={setPage}

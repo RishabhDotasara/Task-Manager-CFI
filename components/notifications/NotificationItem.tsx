@@ -1,19 +1,13 @@
 import { formatDistanceToNow } from "date-fns";
-import {
-  MessageSquare,
-  Calendar,
-  Users,
-  CheckSquare,
-  Bell,
-  Lightbulb,
-  User2,
-} from "lucide-react";
+import { NotificationType, User, Notification } from "@prisma/client";
+import { MessageSquare, Calendar, Users, CheckSquare, Bell, Lightbulb } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Notification, NotificationType, User } from "@prisma/client";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { NotificationIcon } from "./NotificationIcon";
 
-const iconMap: Record<NotificationType, React.ComponentType<any>> = {
+const iconMap: Record<NotificationType, typeof MessageSquare> = {
   COMMENT: MessageSquare,
   TASK: CheckSquare,
   TEAM: Users,
@@ -22,91 +16,65 @@ const iconMap: Record<NotificationType, React.ComponentType<any>> = {
   REQUEST: Lightbulb,
 };
 
+const typeVariantMap: Record<NotificationType, "default" | "success" | "warning" | "error" | "info"> = {
+  COMMENT: "default",
+  TASK: "success",
+  TEAM: "warning",
+  EVENT: "default",
+  UPDATE: "info",
+  REQUEST: "warning",
+};
+
 interface NotificationItemProps {
   notification: Notification & { sender: User; receiver: User };
   onMarkAsRead: (id: number) => void;
 }
 
-export function NotificationItem({
-  notification,
-  onMarkAsRead,
-}: NotificationItemProps) {
+export function NotificationItem({ notification, onMarkAsRead }: NotificationItemProps) {
   const Icon = iconMap[notification.type];
-
-  // const getActionURL = async (task:string)=>{
-  //   const urlMap: Record<NotificationType, string> = {
-  //     COMMENT : `/task-manager/task/${teamId}`,
-  //     TEAM: "",
-  //     EVENT: "",
-  //     UPDATE: "",
-  //     REQUEST: "",
-  //     TASK: `/task-manager/task/${teamId}`
-  //   }
-  // }
+  
   return (
-    <div
-      className={cn(
-        "flex items-start gap-4 p-4 transition-colors",
-        !notification.read && "bg-secondary/40"
-      )}
-    >
-      <div className="relative">
-        <User2 className="h-10 w-10 rounded-full" />
-        <div className="absolute -bottom-1 -right-1 p-1 bg-background rounded-full">
-          <Icon className="w-4 h-4 text-primary" />
-        </div>
-      </div>
+    <div className={cn(
+      "group flex items-start gap-4 p-4 hover:bg-muted/50 transition-colors",
+      !notification.read && "bg-secondary/40"
+    )}>
+      <Avatar className="h-8 w-8">
+        <AvatarImage src={notification.sender.avatarUrl} />
+        <AvatarFallback>{notification.sender.username.slice(0, 2).toUpperCase()}</AvatarFallback>
+      </Avatar>
 
       <div className="flex-1 min-w-0">
-        <div className="flex items-start justify-between gap-2">
-          <div className="w-full">
-            <div className="flex items-center gap-2  ">
-              <div className="flex justify-between w-full items-center mb-2 ">
-                <p className="font-medium text-sm">{notification.title}</p>
-                <time className="text-xs text-muted-foreground whitespace-nowrap">
-                  {formatDistanceToNow(notification.timestamp, {
-                    addSuffix: true,
-                  })}
-                </time>
-              </div>
-              {notification.requestType && (
-                <Badge
-                  variant={
-                    notification.requestType === "BUG"
-                      ? "destructive"
-                      : "default"
-                  }
-                >
-                  {notification.requestType}
-                </Badge>
-              )}
-            </div>
-            <p className="text-muted-foreground text-sm w-full ">
-              {notification.message}
-            </p>
-            <p className="text-muted-foreground text-xs w-full mt-2">
-              - By {notification.sender.username}
-            </p>
-          </div>
+        <div className="flex items-center mb-1 gap-2">
+          <NotificationIcon 
+            icon={Icon} 
+            variant={typeVariantMap[notification.type]}
+            className=""
+          />
+          <span className="font-medium text-sm">{notification.title}</span>
+          {notification.requestType && (
+            <Badge variant={notification.requestType === "BUG" ? "destructive" : "default"}>
+              {notification.requestType}
+            </Badge>
+          )}
         </div>
 
-        <div className="mt-2 flex items-center gap-2">
-          {/* <Button
-            variant="outline"
-            size="sm"
-            className="text-xs"
-            onClick={() => (window.location.href = notification.actionUrl)}
-          >
-            View Details
-          </Button> */}
+        <p className="text-sm text-muted-foreground mb-2">
+          {notification.message}
+        </p>
+
+        <div className="flex items-center justify-between">
+          <p className="text-xs text-muted-foreground">
+            By {notification.sender.username} • {formatDistanceToNow(notification.timestamp, { addSuffix: true })}
+          </p>
+          
           {!notification.read && (
             <Button
               variant="ghost"
               size="sm"
-              className="text-xs"
+              className="opacity-0 group-hover:opacity-100 transition-opacity text-xs"
               onClick={() => onMarkAsRead(notification.notificationId)}
             >
-              Mark as Read
+              Mark as read
             </Button>
           )}
         </div>

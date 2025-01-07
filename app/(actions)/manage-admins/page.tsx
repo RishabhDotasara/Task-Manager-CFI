@@ -11,6 +11,8 @@ import { ResourceError } from "@/components/error/resource-error";
 import { useRecoilValue } from "recoil";
 import { permissionAtom } from "@/states/permissionAtom";
 
+export const dynamic = "force-dynamic";
+
 export default function AdminsPage() {
   const [selectedUserId, setSelectedUserId] = useState<string>("");
   const { toast } = useToast();
@@ -26,6 +28,7 @@ export default function AdminsPage() {
       const data = await response.json()
       return data.users
     },
+    staleTime: 5 * 60 * 1000,
   });
 
   // Fetch admins

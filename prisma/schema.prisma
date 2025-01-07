@@ -36,7 +36,6 @@ model Session {
   team        Team      @relation("session-relation-team", fields: [teamId], references: [teamId])
   eventType   EventType
 }
-
 model Club {
   clubId    String @id @default(uuid())
   clubName  String

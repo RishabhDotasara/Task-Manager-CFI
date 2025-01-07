@@ -11,7 +11,7 @@ export async function PUT(req: NextRequest) {
       data: {
         clubName: clubName,
         clubLeads: {
-          connect: clubLeads.map((leadId: string) => {
+          set: clubLeads.map((leadId: string) => {
             return {
               userId: leadId,
             };

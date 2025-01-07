@@ -15,11 +15,13 @@ import { TeamSelector } from "@/components/layout/team-selector";
 import { UserMenu } from "@/components/layout/user-menu";
 import { useQuery } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools/build/modern/production.js";
-import { Team, User } from "@prisma/client";
+import { Club, Team, User } from "@prisma/client";
 import { permissionAtom } from "@/states/permissionAtom";
 import { getDynamicPermissions } from "@/permissionManager/permissions";
 import { NotificationPopover } from "@/components/notifications/NotificationPopOver";
 import { notificationAtom } from "@/states/notificationAtom";
+import { clubAtom } from "@/states/clubAtoms";
+import useUserInfo from "@/hooks/use-userinfo";
 
 export default function DashboardLayout({
   children,
@@ -34,76 +36,9 @@ export default function DashboardLayout({
   const [currentTeam, setCurrentTeam] = useRecoilState(teamAtom);
   const [isLoading, setIsLoading] = useState(false);
   const [permission, setPermissions] = useRecoilState(permissionAtom);
-  const [notifications, setNotifications] = useRecoilState(notificationAtom)
- 
-  //also fetch the user and store the permissions in the permissionsAtom
-  const fetchUser = async () => {
-    try {
-      const response = await fetch(
-        `/api/user/get?userId=${session.data?.userId}`
-      );
-      const data: {
-        user: { permissions: string[]; teams: Team[]; teamLeader: Team[] };
-      } = await response.json();
-      if (data.user) {
-        console.log(data);
-        const generatedPermissions = await getDynamicPermissions(
-          data.user.teams,
-          data.user.teamLeader
-        );
-        console.log("Generated Permissions: ", generatedPermissions);
-        setPermissions([
-          ...data.user.permissions,
-          ...(generatedPermissions || []),
-        ]);
-        setTeams(data.user.teams);
-        if (data.user.teams.length > 0) {
-          setCurrentTeam(data.user.teams[0].teamId);
-        }
-        return data.user;
-      }
-    } catch (err) {
-      console.log("Error Fetching User Profile!", err);
-      toast({
-        title: "Error Fetching User Profile",
-        description: "Slow Internet Maybe!",
-      });
-    }
-  };
-
-  const fetchNotifications = async ()=>{
-    try 
-    {
-      const response = await fetch(`/api/notification/getAll?userId=${session.data?.userId}`);
-      const data = await response.json()
-      setNotifications(data.notifications)
-      return data.notifications
-    }
-    catch(err)
-    {
-      console.log(err)
-      toast({
-        title:"Error Fetching Notifications!",
-        description:"Try Again!",
-        variant:"destructive"
-      })
-    }
-  }
-
-  const userQuery = useQuery({
-    queryKey: ["user", session.data?.userId],
-    queryFn: fetchUser,
-    staleTime: 1000 * 60 * 5,
-    refetchInterval: 1000 * 60 * 5,
-  });
-
-  const notificationsQuery = useQuery({
-    queryKey:['notifications', session.data?.userId],
-    queryFn:fetchNotifications,
-    staleTime: 5 * 60 * 1000,
-    refetchInterval: 5 * 60 * 1000,
-    
-  })
+  const [notifications, setNotifications] = useRecoilState(notificationAtom);
+  const [userClubs, setuserClubs] = useRecoilState(clubAtom);
+  const UserInfoQuery = useUserInfo()
 
   useEffect(() => {
     if (session.status === "unauthenticated") {
@@ -114,11 +49,11 @@ export default function DashboardLayout({
       });
     }
   }, [session.status]);
-
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
   useEffect(() => {
-    // @ts-ignore
-    window.toggleDevtools = () => setShowDevtools((old) => !old);
-  }, []);
+    UserInfoQuery.data && setTeams(UserInfoQuery.data.teams)
+    UserInfoQuery.data && setCurrentTeam(UserInfoQuery.data.teams[0].teamId)
+  }, [UserInfoQuery.isLoading]);
 
   const handleLogOut = async () => {
     try {
@@ -144,19 +79,19 @@ export default function DashboardLayout({
         <div className="hidden border-r bg-background md:block">
           <div className="flex h-full max-h-screen flex-col gap-2">
             <div className="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6">
-              {!userQuery.isError && (
+              {!UserInfoQuery.isError && (
                 <TeamSelector
                   teams={teams || []}
                   currentTeam={currentTeam}
                   onTeamChange={setCurrentTeam}
                 />
               )}
-              {userQuery.isError && (
+              {UserInfoQuery.isError && (
                 <Button
                   variant={"outline"}
                   className="w-full mr-2"
                   onClick={() => {
-                    userQuery.refetch();
+                    UserInfoQuery.refetch();
                   }}
                 >
                   Try Again!
@@ -211,9 +146,8 @@ export default function DashboardLayout({
           </main>
         </div>
       </div>
-      {process.env.NODE_ENV === "development" && (
-        <ReactQueryDevtools initialIsOpen />
-      )}
+
+      <ReactQueryDevtools initialIsOpen />
     </>
   );
 }

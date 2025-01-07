@@ -1,3 +1,4 @@
+"use client";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,22 +12,13 @@ import { cn } from "@/lib/utils";
 
 interface EditClubSectionProps {
   club: Club & { clubLeads: User[] };
-  onClose: () => void;
   userOptions: { value: string; label: string }[];
-  isOpen: boolean;
 }
 
-export function EditClubSection({
-  club,
-  onClose,
-  userOptions,
-  isOpen,
-}: EditClubSectionProps) {
-
+export function EditClubSection({ club, userOptions }: EditClubSectionProps) {
   const [editedClub, setEditedClub] = useState<
     Omit<Club, "clubLeads"> & { clubLeads: string[] }
-  >(club);
-
+  >({ ...club, clubLeads: club.clubLeads.map((lead: User) => lead.userId) });
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -43,8 +35,7 @@ export function EditClubSection({
     },
     onSuccess: () => {
       toast({ title: "Club updated successfully" });
-      queryClient.invalidateQueries({ queryKey: ["clubs"] });
-      onClose();
+      queryClient.invalidateQueries({ queryKey: ["club", club.clubId] });
     },
     onError: () => {
       toast({ title: "Failed to update club", variant: "destructive" });
@@ -57,18 +48,11 @@ export function EditClubSection({
   };
 
   return (
-    <div
-      className={cn(
-        "fixed top-0 right-0 w-96 h-full bg-background border-l border-border shadow-lg transform transition-transform duration-300 ease-in-out z-50",
-        isOpen ? "translate-x-0" : "translate-x-full"
-      )}
-    >
+    <div>
       <div className="p-6 h-full overflow-y-auto">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-bold">Edit Club</h2>
-          <Button variant="ghost" onClick={onClose}>
-            <X className="h-4 w-4" />
-          </Button>
+        
         </div>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-2">
@@ -90,7 +74,7 @@ export function EditClubSection({
             </Label>
             <SearchableMultiSelect
               options={userOptions}
-              value={club.clubLeads.map((lead:User)=>lead.userId)}
+              value={editedClub.clubLeads.map((lead: string) => lead)}
               onValueChange={(value) =>
                 setEditedClub({ ...editedClub, clubLeads: value })
               }
@@ -105,19 +89,15 @@ export function EditClubSection({
                   </li>
                 ))}
               </ul>
-        
             </div>
           </div>
 
           <div className="flex justify-end gap-2">
-            <Button variant="outline" onClick={onClose} type="button">
-              Cancel
-            </Button>
             <Button type="submit" disabled={clubMutation.isPending}>
               {clubMutation.isPending && (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               )}
-              Update Club
+              Update Details
             </Button>
           </div>
         </form>
