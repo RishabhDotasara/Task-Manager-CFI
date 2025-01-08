@@ -149,8 +149,11 @@ export default function DashboardLayout({
           </main>
         </div>
       </div>
-
-      <ReactQueryDevtools initialIsOpen />
+      {
+        process.env.NODE_ENV === "development" && (
+          <ReactQueryDevtools initialIsOpen />
+        )
+      }
     </>
   );
 }
