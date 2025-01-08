@@ -22,21 +22,22 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
 import { useState } from "react";
 
-interface CreateTeamDialogProps {}
+interface CreateTeamDialogProps {
+  clubId:string
+}
 
-export function CreateTeamDialog({}: CreateTeamDialogProps) {
+export function CreateTeamDialog({clubId}: CreateTeamDialogProps) {
   const [open, setOpen] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [creatingTeamName, setCreatingTeamName] = useState("");
-  const [selectedClub, setSelectedClub] = useState("");
 
   const handleCreateTeam = async () => {
     const response = await fetch("/api/teams/create", {
       method: "POST",
       body: JSON.stringify({ 
         name: creatingTeamName,
-        clubId: selectedClub 
+        clubId: clubId 
       }),
     });
   };
@@ -50,7 +51,6 @@ export function CreateTeamDialog({}: CreateTeamDialogProps) {
         description: "Changes will be reflected on UI.",
       });
       setCreatingTeamName("");
-      setSelectedClub("");
       setOpen(false);
       queryClient.invalidateQueries({ queryKey: ["teams", "all"] });
     },
@@ -60,23 +60,7 @@ export function CreateTeamDialog({}: CreateTeamDialogProps) {
     },
   });
 
-  const fetchAllClubs = async () => {
-    try {
-      const response = await fetch("/api/clubs/getAll");
-      const data = await response.json(); 
-      console.log(data)
-      return data.clubs;
-    } catch(err) {
-      console.log(err);
-      toast({ title: "Failed to fetch clubs", variant: "destructive" });
-    }
-  };
 
-  const fetchAllClubsQuery = useQuery({
-    queryKey: ["clubs", "all"],
-    queryFn: fetchAllClubs,
-    staleTime: 1000 * 60 * 5,
-  });
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -99,34 +83,13 @@ export function CreateTeamDialog({}: CreateTeamDialogProps) {
               onChange={(e) => setCreatingTeamName(e.target.value)}
             />
           </div>
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="club" className="text-right">
-              Club
-            </Label>
-            <Select
-              value={selectedClub}
-              onValueChange={setSelectedClub}
-              disabled={fetchAllClubsQuery.isLoading}
-            >
-              <SelectTrigger className="col-span-3">
-                <SelectValue placeholder="Select a club" />
-              </SelectTrigger>
-              <SelectContent>
-                {fetchAllClubsQuery.data?.map((club:Club) => (
-                  <SelectItem key={club.clubId} value={club.clubId}>
-                    {club.clubName}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
         </div>
         <DialogFooter>
           <Button
             onClick={() => {
               createTeamMutation.mutate();
             }}
-            disabled={createTeamMutation.isPending || !selectedClub || !creatingTeamName.trim()}
+            disabled={createTeamMutation.isPending || !clubId || !creatingTeamName.trim()}
           >
             Create Team
             {createTeamMutation.isPending && (

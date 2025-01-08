@@ -3,23 +3,27 @@ generator client {
 }
 
 datasource db {
-  provider          = "postgresql"
-  url               = env("DATABASE_URL")
-  shadowDatabaseUrl = "postgresql://neondb_owner:YFphr2EP8SHx@ep-green-block-a1jbwxl4-pooler.ap-southeast-1.aws.neon.tech/prisma_migrate_shadow_db_87b68c1b-3067-454d-8391-b2d168d1ff95?sslmode=require"
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model User {
-  userId       String    @id @default(uuid())
-  password     String
-  employeeId   String    @unique
-  username     String    @default("")
-  permissions  String[]  @default([])
-  email        String    @default("test@gmail.com")
-  comments     Comment[]
-  tasks        Task[]    @relation("assignedTasks")
-  createdTasks Task[]    @relation("createdTasks")
-  teams        Team[]    @relation("teamMembers")
-  teamLeader   Team[]    @relation("teamLeader")
+  userId                String         @id @default(uuid())
+  password              String
+  employeeId            String         @unique
+  username              String         @default("")
+  permissions           String[]       @default([])
+  email                 String         @default("test@gmail.com")
+  comments              Comment[]
+  tasks                 Task[]         @relation("assignedTasks")
+  createdTasks          Task[]         @relation("createdTasks")
+  teams                 Team[]         @relation("teamMembers")
+  teamLeader            Team[]         @relation("teamLeader")
+  clubLead              Club[]         @relation("clubLead")
+  sentNotification      Notification[] @relation("SentNotifications")
+  recievedNotifications Notification[] @relation("ReceivedNotifications")
+
+  @@index([employeeId])
 }
 
 model Session {
@@ -34,11 +38,11 @@ model Session {
   team        Team      @relation("session-relation-team", fields: [teamId], references: [teamId])
   eventType   EventType
 }
-
 model Club {
-  clubId   String @id @default(uuid())
-  clubName String
-  teams    Team[] @relation("clubTeam")
+  clubId    String @id @default(uuid())
+  clubName  String
+  teams     Team[] @relation("clubTeam")
+  clubLeads User[] @relation("clubLead")
 }
 
 model Team {
@@ -48,7 +52,7 @@ model Team {
   tasks    Task[]    @relation("teamTasks")
   members  User[]    @relation("teamMembers")
   sessions Session[] @relation("session-relation-team")
-  leaders  User[]     @relation("teamLeader")
+  leaders  User[]    @relation("teamLeader")
   clubId   String
   club     Club      @relation("clubTeam", fields: [clubId], references: [clubId])
 }
@@ -100,4 +104,37 @@ enum Status {
 enum EventType {
   ONLINE
   INPERSON
+}
+
+model Notification {
+  notificationId Int              @id @default(autoincrement())
+  type           NotificationType
+  title          String
+  message        String
+  timestamp      DateTime         @default(now())
+  read           Boolean          @default(false)
+  actionUrl      String
+  requestType    RequestType?
+  toKeep         Boolean          @default(true)
+  senderId       String
+  sender         User             @relation("SentNotifications", fields: [senderId], references: [userId])
+  receiverId     String
+  receiver       User             @relation("ReceivedNotifications", fields: [receiverId], references: [userId])
+
+  @@index([senderId])
+  @@index([receiverId])
+}
+
+enum RequestType {
+  FEATURE
+  BUG
+}
+
+enum NotificationType {
+  COMMENT
+  TASK
+  TEAM
+  EVENT
+  UPDATE
+  REQUEST
 }

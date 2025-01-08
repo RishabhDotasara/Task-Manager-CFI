@@ -10,8 +10,7 @@ export async function GET(request: Request) {
     const prisma = new PrismaClient();
     let tasks:any = [];
     // Fetch tasks assigned to the specified assignee
-    console.log("assigneeId", assigneeId);
-    console.log("teamId", teamId);
+
     if (assigneeId)
     {
        tasks = await prisma.task.findMany({

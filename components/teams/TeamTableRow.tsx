@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState } from "react";
@@ -40,7 +41,7 @@ export default function TeamTableRow({
   return (
     <>
       {team && team.members && team.leaders && <TableRow>
-        <TableCell>{team.name}</TableCell>
+        <TableCell>{team.name} </TableCell>
         <TableCell>{team.members?.length} members</TableCell>
         <TableCell>{team.leaders?.length} leaders</TableCell>
         <TableCell>
@@ -62,13 +63,16 @@ export default function TeamTableRow({
             )}
 
             {hasPermission(userPermissions, permissions.team.delete(team.teamId)) && (
+              <>
+             
               <DeleteTeamDialog
-                teamName={team.name}
+              teamName={team.name}
                 isOpen={isDeleteDialogOpen}
                 onOpenChange={setIsDeleteDialogOpen}
                 onDelete={() => deleteTeamMutation.mutate(team.teamId)}
                 isDeleting={deleteTeamMutation.isPending}
               />
+              </>
             )}
           </div>
         </TableCell>

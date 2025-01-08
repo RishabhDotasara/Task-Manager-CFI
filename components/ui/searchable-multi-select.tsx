@@ -14,6 +14,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
+import { useState, useEffect } from "react";
 
 interface Option {
   value: string;
@@ -29,6 +30,8 @@ interface SearchableMultiSelectProps {
   emptyText?: string;
   className?: string;
   disabled?: boolean;
+  onSearch?: (search: string) => Promise<void | undefined>;
+  shouldFilter?: boolean;
 }
 
 export function SearchableMultiSelect({
@@ -40,9 +43,42 @@ export function SearchableMultiSelect({
   emptyText = "No items found.",
   className,
   disabled = false,
+  onSearch,
+  shouldFilter = true,
 }: SearchableMultiSelectProps) {
+  const [open, setOpen] = useState(false);
+  const [searchDebounce, setSearchDebounce] = useState<NodeJS.Timeout>();
+
+  // Handle search with debouncing
+  const handleSearch = (search: string) => {
+    if (searchDebounce) {
+      clearTimeout(searchDebounce);
+    }
+
+    // Debounce search to avoid too many database queries
+    const timeout = setTimeout(() => {
+      if (onSearch) {
+        if (search.trim().length > 4)
+        {
+          onSearch(search);
+        }
+      }
+    }, 300);
+
+    setSearchDebounce(timeout);
+  };
+
+  // Cleanup debounce timeout
+  useEffect(() => {
+    return () => {
+      if (searchDebounce) {
+        clearTimeout(searchDebounce);
+      }
+    };
+  }, [searchDebounce]);
+
   return (
-    <Popover>
+    <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button
           variant="outline"
@@ -54,15 +90,18 @@ export function SearchableMultiSelect({
             className
           )}
         >
-          {value.length > 0
-            ? `${value.length} items selected`
-            : placeholder}
+          {value.length > 0 ? `${value.length} items selected` : placeholder}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-[400px] p-0">
-        <Command>
-          <CommandInput placeholder={searchPlaceholder} />
+        <Command shouldFilter={shouldFilter}>
+          {" "}
+          {/* Disable built-in filtering */}
+          <CommandInput
+            placeholder={searchPlaceholder}
+            onValueChange={handleSearch}
+          />
           <CommandList>
             <CommandEmpty>{emptyText}</CommandEmpty>
             <CommandGroup>
@@ -79,9 +118,7 @@ export function SearchableMultiSelect({
                   <Check
                     className={cn(
                       "mr-2 h-4 w-4",
-                      value.includes(option.value)
-                        ? "opacity-100"
-                        : "opacity-0"
+                      value.includes(option.value) ? "opacity-100" : "opacity-0"
                     )}
                   />
                   {option.label}

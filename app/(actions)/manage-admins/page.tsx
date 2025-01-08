@@ -11,6 +11,8 @@ import { ResourceError } from "@/components/error/resource-error";
 import { useRecoilValue } from "recoil";
 import { permissionAtom } from "@/states/permissionAtom";
 
+export const dynamic = "force-dynamic";
+
 export default function AdminsPage() {
   const [selectedUserId, setSelectedUserId] = useState<string>("");
   const { toast } = useToast();
@@ -23,12 +25,14 @@ export default function AdminsPage() {
     queryFn: async () => {
       const response = await fetch("/api/user/getAll");
       if (!response.ok) throw new Error("Failed to fetch users");
-      return response.json();
+      const data = await response.json()
+      return data.users
     },
+    staleTime: 5 * 60 * 1000,
   });
 
   // Fetch admins
-  const { data: admins, isLoading: isLoadingAdmins } = useQuery({
+  const { data: admins, isLoading: isLoadingAdmins, isError } = useQuery({
     queryKey: ["users", "admins"],
     queryFn: async () => {
       const response = await fetch("/api/user/getAdmins");
@@ -37,7 +41,8 @@ export default function AdminsPage() {
       console.log(data);
       return data.admins;
     },
-    staleTime: 5 * 60 * 1000
+    staleTime: 5 * 60 * 1000,
+    enabled: Boolean(users)
   });
 
   // Add admin mutation
@@ -78,6 +83,13 @@ export default function AdminsPage() {
       });
       if (!response.ok) throw new Error("Failed to remove admin");
       return response.json();
+    },
+    onMutate: ()=>{
+      toast({
+        title: "Removing Admin",
+        description: "Revoking admin privileges...",
+        variant: "info",
+      })
     },
     onSuccess: () => {
       toast({
@@ -143,6 +155,11 @@ export default function AdminsPage() {
               description: "This is a punishable Offence!",
             });
           }}
+        />
+      )}
+      {isError && (
+        <ResourceError
+          onRetry={() => queryClient.invalidateQueries({ queryKey: ["users","all"] })}
         />
       )}
     </>

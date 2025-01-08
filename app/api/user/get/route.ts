@@ -21,7 +21,12 @@ export async function GET(request: Request)
                 employeeId: true,
                 permissions:true, 
                 teams:true,
-                teamLeader:true
+                teamLeader:true,
+                clubLead:{
+                    include:{
+                        teams:true
+                    }
+                }
             },
         });
 

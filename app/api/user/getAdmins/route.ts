@@ -2,6 +2,7 @@ import { permissions } from "@/permissionManager/permissions";
 import { PrismaClient } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 
+export const dynamic = 'force-dynamic';
 
 
 export async function GET(req:NextRequest)

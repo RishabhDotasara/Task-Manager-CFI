@@ -15,7 +15,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { SearchableMultiSelect } from "@/components/ui/searchable-multi-select";
 import { Team, User } from "@prisma/client";
-import { useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
+import useAllUsersQuery from "@/hooks/use-allusers";
 
 const formSchema = z.object({
   teamName: z.string().min(2, {
@@ -48,6 +49,7 @@ export function TeamForm({
       leaders: teamData.leaders.map((member: User) => member.userId),
     },
   });
+  const {searchUserMutation} = useAllUsersQuery()
 
   useEffect(() => {
     form.reset({
@@ -57,15 +59,32 @@ export function TeamForm({
     });
   }, [teamData]);
 
-  const userOptions = users.map((user) => ({
-    value: user.userId,
-    label: user.username,
-  }));
+
+  const [searchUsers, setSearchUsers] = useState<User[] | any[]>(users || []);
+
+  const userOptions = useMemo(() => {
+    return searchUsers.map((user: Pick<User, "employeeId" | "username" | "userId">) => ({
+      value: user.userId,
+      label: `${user.username} | ${user.employeeId}`,
+    }));
+  }, [searchUsers]);
+
+  const onSearch = async (employeeId:string)=>{
+    searchUserMutation.mutate(employeeId, {
+      onSuccess: (data) => {
+        console.log(data)
+        setSearchUsers(data || []);
+      },
+    });
+  }
+
 
   const memberOptions = teamData.members.map((user) => ({
     value: user.userId,
     label: user.username,
   }));
+
+
 
   return (
     <Form {...form}>
@@ -91,6 +110,8 @@ export function TeamForm({
               <FormLabel>Team Members</FormLabel>
               <FormControl>
                 <SearchableMultiSelect
+                  onSearch={onSearch}
+                  shouldFilter={false}
                   options={userOptions}
                   value={field.value}
                   onValueChange={(value) => form.setValue("members", value)}
@@ -115,6 +136,7 @@ export function TeamForm({
               <FormLabel>Team Leaders</FormLabel>
               <FormControl>
                 <SearchableMultiSelect
+                  onSearch={async ()=>{}}
                   options={memberOptions}
                   value={field.value}
                   onValueChange={(value) => form.setValue("leaders", value)}
