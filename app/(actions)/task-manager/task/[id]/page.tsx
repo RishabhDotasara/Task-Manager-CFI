@@ -23,6 +23,7 @@ import { ResourceError } from "@/components/error/resource-error";
 import { Button } from "@/components/ui/button";
 import { useRecoilValue } from "recoil";
 import { teamAtom } from "@/states/teamAtom";
+import ReloadButton from "@/components/ReloadButton";
 
 export default function TaskDetails() {
   const [newComment, setNewComment] = useState("");
@@ -181,6 +182,8 @@ export default function TaskDetails() {
             isLoading={taskQuery.isLoading}
             isDeleting={isDeleting}
             onDelete={deleteTaskMutation.mutate}
+            onRefetch={taskQuery.refetch}
+            isRefetching={taskQuery.isRefetching}
           />
           <TaskDueDate
             deadline={taskQuery.data?.deadline as Date}
@@ -214,6 +217,7 @@ export default function TaskDetails() {
       <Card className="mt-6">
         <CardHeader>
           <CardTitle>Comments</CardTitle>
+          
         </CardHeader>
         <CardContent>
           <div className="space-y-4">

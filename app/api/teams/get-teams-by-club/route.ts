@@ -9,6 +9,8 @@ export async function GET(req:NextRequest)
         const prisma = new PrismaClient()
         const {searchParams} = new URL(req.url)
         const clubId:string = searchParams.get("clubId") || ""
+        const page = parseInt(searchParams.get("page") || "1")
+        const limit = parseInt(searchParams.get("limit") || "10")
         const teams = await prisma.team.findMany({
             where:{
                 clubId:clubId
@@ -17,7 +19,9 @@ export async function GET(req:NextRequest)
                 members:true,
                 leaders:true,
                 
-            }
+            },
+            skip:(page-1)*limit,
+            take:limit
         })
         return NextResponse.json({message:"Success", teams}, {status:200})
     }

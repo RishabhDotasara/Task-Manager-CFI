@@ -1,16 +1,6 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import Link from "next/link";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-  Cell,
-} from "recharts";
 import {
   Card,
   CardContent,
@@ -25,20 +15,10 @@ import { Task, User } from "@prisma/client";
 import { useToast } from "@/hooks/use-toast";
 import TaskDialog from "@/components/add-task";
 import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { teamAtom } from "@/states/teamAtom";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ResourceError } from "@/components/error/resource-error";
 import { UserSession } from "@/app/api/auth/[...nextauth]/route";
 import { Session } from "next-auth";
@@ -48,6 +28,7 @@ import { permissionAtom } from "@/states/permissionAtom";
 import TaskStatusCard from "@/components/taskManagerDashboard/TaskStatusCard";
 import TaskFilters from "@/components/taskManagerDashboard/TaskFilters";
 import TaskList from "@/components/taskManagerDashboard/TaskList";
+import ReloadButton from "@/components/ReloadButton";
 
 const statusColors = {
   PENDING: "bg-red-500 text-white",
@@ -78,6 +59,7 @@ export default function HomePage() {
   const [deadlineFilter, setDeadlineFilter] = useState("all");
   const [currentTeamId, setCurrentTeamId] = useRecoilState(teamAtom);
   const userPermissions = useRecoilValue(permissionAtom)
+  const queryClient = useQueryClient()
 
   const fetchTasks = async () => {
     try {
@@ -93,6 +75,7 @@ export default function HomePage() {
       setDeadlineFilter("all");
       const data = await response.json();
       setFilteredTasks(Array.isArray(data) ? data : []);
+     
       return Array.isArray(data) ? data : [];
     } catch (error) {
       console.error("Error fetching tasks:", error);
@@ -228,6 +211,7 @@ export default function HomePage() {
     <div className="container mx-auto p-4 space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Your Tasks</h1>
+        <div className="flex gap-2 items-center">
         {session.status === "authenticated" &&
           hasPermission(userPermissions, permissions.task.create(currentTeamId)) && (
             <TaskDialog
@@ -237,6 +221,8 @@ export default function HomePage() {
               all={usersQuery.data || []}
             />
           )}
+        <ReloadButton onRefetch={tasksQuery.refetch} isRefetching={tasksQuery.isRefetching}/>
+        </div>
       </div>
 
       <div className="grid gap-4 md:grid-cols-3">

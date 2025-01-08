@@ -25,7 +25,7 @@ export default function ClubInfo() {
   const [editingTeam, setEditingTeam] = useState<Team | null>(null);
   const { toast } = useToast();
   const session = useSession();
-  const limit = 10;
+  const limit = 5;
   const [page, setPage] = useState(1);
   const [isDeleting, setIsDeleting] = useState(false);
   const queryClient = useQueryClient();
@@ -124,11 +124,11 @@ export default function ClubInfo() {
   })
 
   const fetchClubTeamsQuery = useQuery({
-    queryKey: ["teams", `clubId:${id}`],
+    queryKey: ["teams", `clubId:${id}`, page],
     queryFn: async () => {
       try {
         const response = await fetch(
-          `/api/teams/get-teams-by-club?clubId=${id}`
+          `/api/teams/get-teams-by-club?clubId=${id}&page=${page}&limit=${limit}`
         );
         const data = await response.json();
         return data.teams;
@@ -141,7 +141,8 @@ export default function ClubInfo() {
         });
       }
     },
-    staleTime:10*60*1000
+    staleTime:10*60*1000,
+    enabled: Boolean(page) || Boolean(limit)
   });
 
 
@@ -181,6 +182,8 @@ export default function ClubInfo() {
             setCurrentPage={setPage}
             limit={limit}
             clubId={id as string}
+            onRefetch={fetchClubTeamsQuery.refetch}
+            isRefetching={fetchClubTeamsQuery.isRefetching}
           />
         </TabsContent>
 

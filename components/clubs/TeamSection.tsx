@@ -20,6 +20,8 @@ import {
 import { TeamTable } from "@/components/teams/TeamTable";
 import { Button } from "@/components/ui/button";
 import { CreateTeamDialog } from "../teams/CreateTeamDialog";
+import ReloadButton from "../ReloadButton";
+import { Dispatch, SetStateAction } from "react";
 
 interface TeamSectionProps {
   teams: Team[];
@@ -29,9 +31,11 @@ interface TeamSectionProps {
   isDeleting: boolean;
   userId?: string;
   currentPage: number;
-  setCurrentPage: (page: number) => void;
+  setCurrentPage: Dispatch<SetStateAction<number>>;
   limit: number;
-  clubId:string
+  clubId:string;
+  onRefetch:Function,
+  isRefetching:boolean
 }
 
 export function TeamSection({
@@ -44,7 +48,9 @@ export function TeamSection({
   currentPage,
   setCurrentPage,
   limit,
-  clubId
+  clubId,
+  onRefetch,
+  isRefetching
 }: TeamSectionProps) {
   return (
     <Card>
@@ -70,6 +76,7 @@ export function TeamSection({
               <BarChart className="h-4 w-4 mr-2" />
               Analytics
             </Button> */}
+            <ReloadButton onRefetch={onRefetch} isRefetching={isRefetching}/>
             <CreateTeamDialog clubId={clubId}/>
           </div>
         </div>
