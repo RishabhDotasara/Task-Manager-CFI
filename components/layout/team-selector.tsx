@@ -8,32 +8,61 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Team } from "@prisma/client";
+import { Club, Team } from "@prisma/client";
+import ReloadButton from "../ReloadButton";
+import { UseQueryResult } from "@tanstack/react-query";
 
 interface TeamSelectorProps {
   teams: Team[];
   currentTeam: string;
   onTeamChange: (teamId: string) => void;
+  fetchQuery: UseQueryResult<
+    | {
+        permissions: string[];
+        teams: Team[];
+        teamLeader: Team[];
+        clubLead: Club[];
+      }
+    | undefined,
+    Error
+  >;
 }
 
-export function TeamSelector({ teams, currentTeam, onTeamChange }: TeamSelectorProps) {
+export function TeamSelector({
+  teams,
+  currentTeam,
+  onTeamChange,
+  fetchQuery,
+}: TeamSelectorProps) {
   return (
-    <Select onValueChange={onTeamChange} value={currentTeam}>
-      <SelectTrigger className="w-[180px]">
-          <SelectValue placeholder={teams ? "Select a Team" : "Loading Teams..."} />
+    <div className="flex gap-2">
+      <Select onValueChange={onTeamChange} value={currentTeam}>
+        <SelectTrigger className="w-[180px]">
+          <SelectValue
+            placeholder={fetchQuery.isLoading || fetchQuery.isRefetching ? "Loading Teams..." : "Select a Team"}
+          />
         </SelectTrigger>
-        <SelectContent >
+        <SelectContent>
           <SelectGroup>
             <SelectLabel>Select Team</SelectLabel>
-            {teams && teams.map((team:any)=>{
-              return (
-                <SelectItem value={team.teamId} key={team.teamId}>{team.name}</SelectItem>
-              )
-            })}
-            {teams && teams.length == 0 && <SelectItem value="No Teams Found!">No Teams Found!</SelectItem>}
-            
+            {teams &&
+              teams.map((team: any) => {
+                return (
+                  <SelectItem value={team.teamId} key={team.teamId}>
+                    {team.name}
+                  </SelectItem>
+                );
+              })}
+            {teams && teams.length == 0 && (
+              <SelectItem value="No Teams Found!">No Teams Found!</SelectItem>
+            )}
           </SelectGroup>
         </SelectContent>
-    </Select>
+      </Select>
+      <ReloadButton
+        isRefetching={fetchQuery.isRefetching}
+        onRefetch={fetchQuery.refetch}
+      />
+    </div>
   );
 }

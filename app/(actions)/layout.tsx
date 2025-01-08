@@ -87,6 +87,7 @@ export default function DashboardLayout({
                   teams={teams || []}
                   currentTeam={currentTeam}
                   onTeamChange={setCurrentTeam}
+                  fetchQuery={UserInfoQuery}
                 />
               )}
               {UserInfoQuery.isError && (
@@ -100,9 +101,6 @@ export default function DashboardLayout({
                   Try Again!
                 </Button>
               )}
-              <div className="p-2">
-                <NotificationPopover />
-              </div>
             </div>
             <div className="flex-1 px-2 lg:px-4">
               <NavigationLinks />
@@ -130,15 +128,17 @@ export default function DashboardLayout({
                     teams={teams || []}
                     currentTeam={currentTeam}
                     onTeamChange={setCurrentTeam}
+                    fetchQuery={UserInfoQuery}
                   />
 
-                  <NotificationPopover />
+              
                 </div>
                 <NavigationLinks className="mt-4" iconClassName="h-5 w-5" />
               </SheetContent>
             </Sheet>
-            <div className="w-full flex-1">
+            <div className="w-full flex-1 flex gap-2">
               <ModeToggle />
+              <NotificationPopover />
             </div>
             <UserMenu onLogout={handleLogOut} />
           </header>
