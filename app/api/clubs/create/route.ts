@@ -9,6 +9,11 @@ export async function POST(req: NextRequest) {
     const club = await prisma.club.create({
       data: {
         clubName: body.name,
+        clubLeads:{
+          connect:{
+            userId:body.userId
+          }
+        }
       },
     });
     await prisma.$disconnect();

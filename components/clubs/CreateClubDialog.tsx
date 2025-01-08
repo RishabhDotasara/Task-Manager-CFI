@@ -15,6 +15,7 @@ import { Loader2 } from "lucide-react";
 import { useState } from "react";
 import { SearchableMultiSelect } from "../ui/searchable-multi-select";
 import { User } from "@prisma/client";
+import { useSession } from "next-auth/react";
 
 interface CreateTeamDialogProps {}
 
@@ -24,11 +25,12 @@ export function CreateClubDialog({}: CreateTeamDialogProps) {
   const queryClient = useQueryClient();
   const [creatingClubName, setcreatingClubName] = useState("");
   const [selectedleaders, setSelectedLeaders] = useState<string[]>([]);
+  const session = useSession()
 
   const handleCreateClub = async () => {
     const response = await fetch("/api/clubs/create", {
       method: "POST",
-      body: JSON.stringify({ name: creatingClubName }),
+      body: JSON.stringify({ name: creatingClubName , userId:session.data?.userId}),
     });
   };
 

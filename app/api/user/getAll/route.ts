@@ -6,20 +6,47 @@ export const dynamic = 'force-dynamic';
 export async function GET(request: Request) {
   try {
     const prisma = new PrismaClient();
+    const {searchParams} = new URL(request.url);
+    const employeeId = searchParams.get('employeeId');
 
-    // Fetch tasks assigned to the specified assignee
-    const users = await prisma.user.findMany({
-      select: {
-        userId: true,
-        employeeId: true,
-        username:true,
-        email:true
-      },
-    });
+    if (!employeeId)
+    {
+      // Fetch tasks assigned to the specified assignee
+      const users = await prisma.user.findMany({
+        select: {
+          userId: true,
+          employeeId: true,
+          username: true,
+          email: true
+        },
+        take: 5
+      });
 
-    await prisma.$disconnect();
+      return NextResponse.json({message:"Success!", users}, {status: 200});
+    }
+    else 
+    {
+      const user = await prisma.user.findUnique({
+        where: {
+          employeeId: employeeId
+        },
+        select: {
+          userId: true,
+          employeeId: true,
+          username: true,
+          email: true
+        }
+      });
 
-    return NextResponse.json({users}, { status: 200 });
+      if (!user)
+      {
+        await prisma.$disconnect();
+        return NextResponse.json({message: "User not found"}, {status: 404});
+      }
+
+      await prisma.$disconnect();
+      return NextResponse.json({message:"Success!", user}, {status: 200});
+    }
   } catch (err) {
     console.log("ERROR fetching users:", err);
     return NextResponse.json(

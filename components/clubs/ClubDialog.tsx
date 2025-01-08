@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,18 +9,33 @@ import { Club, User } from "@prisma/client";
 import { SearchableMultiSelect } from "@/components/ui/searchable-multi-select";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
+import useAllUsersQuery from "@/hooks/use-allusers";
 
 interface EditClubSectionProps {
   club: Club & { clubLeads: User[] };
-  userOptions: { value: string; label: string }[];
 }
 
-export function EditClubSection({ club, userOptions }: EditClubSectionProps) {
+export function EditClubSection({ club }: EditClubSectionProps) {
   const [editedClub, setEditedClub] = useState<
     Omit<Club, "clubLeads"> & { clubLeads: string[] }
   >({ ...club, clubLeads: club.clubLeads.map((lead: User) => lead.userId) });
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const {searchUserMutation, allUsersQuery} = useAllUsersQuery()
+  const [searchUsers, setSearchUsers] = useState<User[] | undefined>(allUsersQuery.data)
+
+  const userOptions = useMemo(() => {
+    return searchUsers?.map((user: User) => ({ value: user.userId, label: `${user.username } | ${user.employeeId}`}));
+  }, [searchUsers]);
+
+  const onSearch = async (employeeId: string) => {
+    await searchUserMutation.mutate(employeeId, {
+      onSuccess: (data) => {
+        setSearchUsers(data || []);
+      },
+    });
+  }
+
 
   const clubMutation = useMutation({
     mutationFn: async (data: Partial<Club>) => {
@@ -52,7 +67,6 @@ export function EditClubSection({ club, userOptions }: EditClubSectionProps) {
       <div className="p-6 h-full overflow-y-auto">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-bold">Edit Club</h2>
-        
         </div>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-2">
@@ -73,6 +87,8 @@ export function EditClubSection({ club, userOptions }: EditClubSectionProps) {
               Club Leaders
             </Label>
             <SearchableMultiSelect
+            onSearch={onSearch}
+            shouldFilter={false}
               options={userOptions}
               value={editedClub.clubLeads.map((lead: string) => lead)}
               onValueChange={(value) =>

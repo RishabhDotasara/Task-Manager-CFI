@@ -22,6 +22,8 @@ model User {
   clubLead              Club[]         @relation("clubLead")
   sentNotification      Notification[] @relation("SentNotifications")
   recievedNotifications Notification[] @relation("ReceivedNotifications")
+
+  @@index([employeeId])
 }
 
 model Session {

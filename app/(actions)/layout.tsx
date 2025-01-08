@@ -51,8 +51,11 @@ export default function DashboardLayout({
   }, [session.status]);
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
   useEffect(() => {
-    UserInfoQuery.data && setTeams(UserInfoQuery.data.teams)
-    UserInfoQuery.data && setCurrentTeam(UserInfoQuery.data.teams[0].teamId)
+    if (UserInfoQuery.data)
+    {
+      UserInfoQuery.data && setTeams(UserInfoQuery.data.teams)
+      // UserInfoQuery.data && setCurrentTeam(UserInfoQuery.data.teams[0].teamId)
+    }
   }, [UserInfoQuery.isLoading]);
 
   const handleLogOut = async () => {

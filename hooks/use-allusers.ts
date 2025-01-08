@@ -1,6 +1,6 @@
 import React from "react";
 import { useToast } from "./use-toast";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 
 export default function useAllUsersQuery() {
   const { toast } = useToast();
@@ -21,16 +21,43 @@ export default function useAllUsersQuery() {
     }
   };
 
+  
   const allUsersQuery = useQuery({
     queryKey: ["users", "all"],
     queryFn: fetchUsers,
     staleTime: 5 * 60 * 1000,
+  });
+  
+  const onSearch = async (employeeId:string) => {
 
+    try {
+      const response = await fetch(`/api/user/getAll?employeeId=${employeeId}`);
+      if (response.ok) {
+        const data = await response.json();
+        return [data.user];
+      }
+      if (response.status == 404)
+      {
+        return allUsersQuery.data
+      }
+    } catch (err) {
+      console.error(err);
+      toast({
+        title: "Failed to search users",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const searchUserMutation = useMutation({
+    mutationKey: ["users", "search"],
+    mutationFn: onSearch,
   });
 
   return {
     allUsersQuery,
-    isLoading:allUsersQuery.isLoading,
-    isError:allUsersQuery.isError
+    isLoading: allUsersQuery.isLoading,
+    isError: allUsersQuery.isError,
+    searchUserMutation
   };
 }

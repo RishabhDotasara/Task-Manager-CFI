@@ -3,7 +3,6 @@ import { EditClubSection } from "@/components/clubs/ClubDialog";
 import { ClubHeader } from "@/components/clubs/ClubHeader";
 import { TeamSection } from "@/components/clubs/TeamSection";
 import { TeamForm } from "@/components/teams/TeamForm";
-import { TeamTable } from "@/components/teams/TeamTable";
 import {
   Card,
   CardContent,
@@ -145,7 +144,6 @@ export default function ClubInfo() {
     staleTime:10*60*1000
   });
 
-  const userOptions = allUsersQuery.data?.map((user:User)=>({value:user.userId, label:user.username}))
 
   useEffect(() => {
     console.log(editingTeam);
@@ -204,8 +202,6 @@ export default function ClubInfo() {
             <CardContent>
               <EditClubSection
                club={fetchClubQuery.data}
-               userOptions={userOptions}
-
               />
             </CardContent>
           </Card>
