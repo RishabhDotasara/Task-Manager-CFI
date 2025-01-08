@@ -10,7 +10,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { CircleUser, Info } from "lucide-react";
+import { CircleUser, Info, User } from "lucide-react";
 import { Role } from "@prisma/client";
 
 interface UserMenuProps {
@@ -48,6 +48,15 @@ export function UserMenu({ role, onLogout }: UserMenuProps) {
           >
             <Info className="mr-2 h-4 w-4" />
             About
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link 
+            href="/profile"
+            className="flex items-center cursor-pointer"
+          >
+            <User className="mr-2 h-4 w-4" />
+            Profile
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem 
