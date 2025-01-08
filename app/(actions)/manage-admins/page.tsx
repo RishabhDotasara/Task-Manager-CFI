@@ -19,17 +19,6 @@ export default function AdminsPage() {
   const queryClient = useQueryClient();
   const userPermissions = useRecoilValue(permissionAtom);
 
-  // Fetch all users
-  const { data: users, isLoading: isLoadingUsers } = useQuery({
-    queryKey: ["users", "all"],
-    queryFn: async () => {
-      const response = await fetch("/api/user/getAll");
-      if (!response.ok) throw new Error("Failed to fetch users");
-      const data = await response.json()
-      return data.users
-    },
-    staleTime: 5 * 60 * 1000,
-  });
 
   // Fetch admins
   const { data: admins, isLoading: isLoadingAdmins, isError } = useQuery({
@@ -42,7 +31,6 @@ export default function AdminsPage() {
       return data.admins;
     },
     staleTime: 5 * 60 * 1000,
-    enabled: Boolean(users)
   });
 
   // Add admin mutation
@@ -107,11 +95,7 @@ export default function AdminsPage() {
     },
   });
 
-  const userOptions =
-    users?.map((user: User) => ({
-      value: user.userId,
-      label: `${user.username} (${user.email})`,
-    })) ?? [];
+
 
   return (
     <>
@@ -124,12 +108,10 @@ export default function AdminsPage() {
               Add New Administrator
             </h2>
             <AddAdminForm
-              userOptions={userOptions}
               selectedUserId={selectedUserId}
               onUserSelect={setSelectedUserId}
               onAddAdmin={() => addAdminMutation.mutate()}
               isLoading={addAdminMutation.isPending}
-              isLoadingUsers={isLoadingUsers}
             />
           </div>
 
