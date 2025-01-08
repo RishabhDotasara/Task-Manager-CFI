@@ -20,8 +20,8 @@ export async function POST(request: NextRequest) {
 
     await generateNotification({
         title: "New Comment",
-        message: comment.content,
-        actionUrl:"",
+        message: `You have a new comment on task "${comment.task.title}"`,
+        actionUrl:"/task-manager/task/"+comment.taskId,
         toKeep: false,
         type: "COMMENT",
         senderId:comment.authorId,

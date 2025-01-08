@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { NotificationIcon } from "./NotificationIcon";
+import { useRouter } from "next/navigation";
 
 const iconMap: Record<NotificationType, typeof MessageSquare> = {
   COMMENT: MessageSquare,
@@ -32,7 +33,8 @@ interface NotificationItemProps {
 
 export function NotificationItem({ notification, onMarkAsRead }: NotificationItemProps) {
   const Icon = iconMap[notification.type];
-  
+  const router = useRouter();
+
   return (
     <div className={cn(
       "group flex items-start gap-4 p-4 hover:bg-muted/50 transition-colors",
@@ -50,7 +52,7 @@ export function NotificationItem({ notification, onMarkAsRead }: NotificationIte
             variant={typeVariantMap[notification.type]}
             className=""
           />
-          <span className="font-medium text-sm">{notification.title}</span>
+          <span className="font-medium text-sm cursor-pointer" onClick={()=>{router.push(notification.actionUrl)}}>{notification.title}</span>
           {notification.requestType && (
             <Badge variant={notification.requestType === "BUG" ? "destructive" : "default"}>
               {notification.requestType}

@@ -53,6 +53,7 @@ export default function TaskDialog({ trigger, triggerFunc, tasks, all }: TaskDia
   const { toast } = useToast()
   const session = useSession()
   const teamId = useRecoilValue(teamAtom)
+  const currentTeamId = useRecoilValue(teamAtom)
   const router = useRouter()
 
   const form = useForm<TaskFormValues>({
@@ -68,6 +69,15 @@ export default function TaskDialog({ trigger, triggerFunc, tasks, all }: TaskDia
   const onSubmit = async (values: TaskFormValues) => {
     try {
       setIsCreating(true)
+      if (!currentTeamId)
+      {
+        toast({
+          title:"Select a Team!",
+          description:"Please select a team to create a task",
+          variant:"destructive"
+        })
+        return;
+      }
 
       const body: Omit<Task, "taskId" | "assigneeId"> & { assigneeIds: string[] } = {
         title: values.title,
