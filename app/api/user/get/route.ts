@@ -18,6 +18,8 @@ export async function GET(request: Request)
             },
             select: {
                 userId: true,
+                email:true,
+                username:true,
                 employeeId: true,
                 permissions:true, 
                 teams:true,
