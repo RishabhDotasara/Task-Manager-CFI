@@ -1,11 +1,11 @@
 #!/bin/bash
 
 # # Wait for PostgreSQL to be ready
-# echo "Waiting for PostgreSQL to be ready..."
-# until pg_isready -h database -p 5432; do
-#   sleep 2
-# done
-# echo "PostgreSQL is ready!"
+echo "Waiting for PostgreSQL to be ready..."
+until pg_isready -h database -p 5432; do
+  sleep 2
+done
+echo "PostgreSQL is ready!"
 
 # Run Prisma migrations
 echo "Running Prisma migrations..."
