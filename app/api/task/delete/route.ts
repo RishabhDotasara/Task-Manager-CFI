@@ -1,3 +1,4 @@
+import { prisma } from "@/lib/prisma";
 import { PrismaClient } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -6,14 +7,14 @@ export async function POST(request:NextRequest)
 {
     try 
     {   
-        const prisma = new PrismaClient();
+  
         const body = await request.json();
         await prisma.task.delete({
             where:{
                 taskId:body.taskId
             }
         })
-        prisma.$disconnect()
+       
         return NextResponse.json({message:"Deleted the task!"}, {status:200})
 
     }

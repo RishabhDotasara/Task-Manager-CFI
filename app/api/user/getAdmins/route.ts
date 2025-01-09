@@ -1,3 +1,4 @@
+import { prisma } from "@/lib/prisma";
 import { permissions } from "@/permissionManager/permissions";
 import { PrismaClient } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
@@ -9,7 +10,7 @@ export async function GET(req:NextRequest)
 {
     try 
     {
-        const prisma = new PrismaClient()
+        
         const admins = await prisma.user.findMany({
             where:{
                 permissions:{

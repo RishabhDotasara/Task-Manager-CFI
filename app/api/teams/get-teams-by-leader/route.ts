@@ -1,3 +1,4 @@
+import { prisma } from "@/lib/prisma";
 import { PrismaClient } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -6,7 +7,7 @@ export const dynamic = 'force-dynamic';
 
 export async function GET(req: NextRequest) {
   try {
-    const prisma = new PrismaClient();
+    
     const { searchParams } = new URL(req.url);
     const leaderId = searchParams.get("leaderId");
     const page = parseInt(searchParams.get("page") || "1");
@@ -27,8 +28,7 @@ export async function GET(req: NextRequest) {
         }
       }
     })
-    // console.log(teams);
-    await prisma.$disconnect();
+  
     return NextResponse.json(
       { teams:teams || [], message: "Teams Fetched by LeaderId " + leaderId },
       { status: 200 }

@@ -3,6 +3,7 @@ import NextAuth from "next-auth/next";
 import Credentials from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { Session } from "next-auth";
+import { prisma } from "@/lib/prisma";
 
 
 export interface UserSession extends Session {
@@ -38,7 +39,6 @@ const handler = NextAuth({
 
       async authorize(credentials, req) {
         try {
-          const prisma = new PrismaClient();
           const id = credentials?.employeeId.toLowerCase();
           const user:User | null = await prisma.user.findUnique({
             where: {
@@ -51,7 +51,6 @@ const handler = NextAuth({
           }
 
           const passwordCheck = await bcrypt.compare(credentials?.password as string, user?.password as string);
-          prisma.$disconnect();
           
           if (passwordCheck) {
             return { id: user.userId, permissions:user.permissions, username:user.username , user}; 

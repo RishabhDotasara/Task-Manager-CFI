@@ -1,13 +1,13 @@
 
-import { PrismaClient, User } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs"
+import { prisma } from "@/lib/prisma";
 
 export async function POST(request:NextRequest)
 {
     try 
     {
-        const prisma = new PrismaClient();
+
         const body = await request.json();
 
         const employeeId =  body.employeeId.toLowerCase()
@@ -23,7 +23,6 @@ export async function POST(request:NextRequest)
             }
         })
 
-        prisma.$disconnect()
         return NextResponse.json({message:"User Creation Successfull"}, {status:200})
 
     }

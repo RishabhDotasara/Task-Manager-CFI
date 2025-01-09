@@ -1,3 +1,4 @@
+import { prisma } from "@/lib/prisma";
 import { permissions } from "@/permissionManager/permissions";
 import { PrismaClient } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
@@ -5,7 +6,7 @@ import { NextRequest, NextResponse } from "next/server";
 export async function POST(req: NextRequest) {
   try {
     const { userId } = await req.json();
-    const prisma = new PrismaClient();
+    
 
     const user = await prisma.user.findUnique({
       where: {

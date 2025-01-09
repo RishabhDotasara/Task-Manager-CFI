@@ -1,3 +1,4 @@
+import { prisma } from "@/lib/prisma";
 import { PrismaClient } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -6,7 +7,7 @@ export async function GET(req:NextRequest)
 {
     try 
     {
-        const prisma = new PrismaClient();
+    
         const {searchParams} = new URL(req.url)
         const userId = searchParams.get("userId")
         const notifications = await prisma.notification.findMany({
@@ -22,7 +23,6 @@ export async function GET(req:NextRequest)
                 timestamp:"desc"
             }
         })
-        prisma.$disconnect()
         return NextResponse.json({message:"Fetched SuccesFully!", notifications})
     }
     catch(err)

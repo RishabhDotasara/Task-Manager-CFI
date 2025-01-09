@@ -1,11 +1,38 @@
 import { generateNotification } from "@/lib/notifications/serverFns";
+import { prisma } from "@/lib/prisma";
 import { PrismaClient } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
+/**
+ * Handles the POST request to update a team.
+ *
+ * @param {NextRequest} request - The incoming request object.
+ * @returns {Promise<NextResponse>} - The response object with a success or error message.
+ *
+ * @throws {Error} - If there is an error updating the team.
+ *
+ * The request body should contain the following properties:
+ * - teamId: The ID of the team to be updated.
+ * - teamName: The new name of the team.
+ * - members: An array of user IDs to be set as members of the team.
+ * - leaders: An array of user IDs to be set as leaders of the team.
+ * - newMembers: An array of user IDs who are newly added to the team.
+ * - newLeaders: An array of user IDs who are newly added as leaders of the team.
+ * - promoterId: The user ID of the person promoting the changes.
+ *
+ * The function performs the following actions:
+ * 1. Parses the request body.
+ * 2. Updates the team with the specified teamId, setting the new name, members, and leaders.
+ * 3. Generates notifications for new members and new leaders.
+ * 4. Returns a success response if the update is successful.
+ * 5. Returns an error response if there is an error during the update process.
+ */
+
+
 export async function POST(request: NextRequest) {
   try {
-    const prisma = new PrismaClient();
+    
     const body = await request.json();
 
     // Update the team with the specified teamId

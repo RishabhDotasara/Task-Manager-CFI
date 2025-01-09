@@ -1,4 +1,5 @@
 import { generateNotification } from "@/lib/notifications/serverFns";
+import { prisma } from "@/lib/prisma";
 import { PrismaClient, Status, Task } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -26,7 +27,7 @@ const getTask = (id:string, body:any) : ReturnTask=>{
 
 export async function POST(request: NextRequest) {
   try {
-    const prisma = new PrismaClient();
+
     const body = await request.json();
     const dataToCreateTasks = body.assigneeIds.map((id:string)=>getTask(id, body))
 

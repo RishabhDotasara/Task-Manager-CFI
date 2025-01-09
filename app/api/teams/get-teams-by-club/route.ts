@@ -1,3 +1,4 @@
+import { prisma } from "@/lib/prisma";
 import { PrismaClient } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -6,7 +7,7 @@ export async function GET(req:NextRequest)
 {
     try 
     {
-        const prisma = new PrismaClient()
+      
         const {searchParams} = new URL(req.url)
         const clubId:string = searchParams.get("clubId") || ""
         const page = parseInt(searchParams.get("page") || "1")
