@@ -93,7 +93,7 @@ We welcome contributions from the community! Please follow these steps:
 
 ## License
 
-This project is licensed under the [LICENSE_NAME] license. See the LICENSE file for details.
+This project is licensed under the [MIT LICENSE](./LICENSE.md) license. See the LICENSE file for details.
 
 ## Acknowledgments
 
