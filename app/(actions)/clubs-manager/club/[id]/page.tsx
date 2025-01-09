@@ -59,6 +59,7 @@ export default function ClubInfo() {
     const oldLeaders = editingTeam?.leaders.map(
       (leader: User) => leader.userId
     );
+    
     const newMembers = data.members.map((memberId: string) => {
       if (!oldMembers?.includes(memberId)) {
         return memberId;

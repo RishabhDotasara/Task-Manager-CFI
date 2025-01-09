@@ -63,6 +63,11 @@ NEXTAUTH_SECRET=your-secret-key
    npm run dev
    ```
 
+## Docker Setup
+
+For detailed instructions on setting up Docker Compose, please refer to the [Docker Setup Guide](./contributing/dockerSetup.md).
+
+
 ## Usage
 
 Use **Teamify** to manage your team’s tasks and schedules efficiently. Features like polling and advanced scheduling will be available in future updates. Simply log in using the secure authentication system and start organizing your team.

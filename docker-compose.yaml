@@ -1,0 +1,30 @@
+version: "3.0"
+services:
+  teamify:
+    build:
+      context: .
+    ports:
+      - "3000:3000"
+    command: ./scripts/wait-for-db.sh
+    volumes:
+      - .:/app
+      - /app/node_modules
+    environment:
+      DATABASE_URL: "postgres://admin:admin@database:5432/postgres"
+      NEXTAUTH_SECRET: "secret"
+    depends_on:
+      - database
+
+  database:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./data:/var/lib/postgresql/data
+
+volumes:
+  data:

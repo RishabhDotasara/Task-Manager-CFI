@@ -4,10 +4,9 @@
   "private": true,
   "scripts": {
     "dev": "next dev -H 0.0.0.0",
-    "build": "next build  && prisma generate ",
+    "build": "next build  && prisma generate",
     "start": "next start",
-    "lint": "next lint",
-    "postinstall": "prisma generate"
+    "lint": "next lint"
   },
   "dependencies": {
     "@cyntler/react-doc-viewer": "^1.17.0",

@@ -1,3 +1,4 @@
+import { prisma } from "@/lib/prisma";
 import { PrismaClient } from "@prisma/client";
 import { NextResponse } from "next/server";
 
@@ -7,7 +8,7 @@ export async function GET(request: Request) {
   const teamId = searchParams.get("teamId");
 
   try {
-    const prisma = new PrismaClient();
+    
     let tasks:any = [];
     // Fetch tasks assigned to the specified assignee
 
@@ -37,8 +38,7 @@ export async function GET(request: Request) {
       });
     }
 
-    await prisma.$disconnect();
-
+ 
     return NextResponse.json(tasks, { status: 200 });
   } catch (err) {
     console.log("ERROR fetching tasks:", err);

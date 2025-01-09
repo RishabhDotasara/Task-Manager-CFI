@@ -1,9 +1,10 @@
+import { prisma } from "@/lib/prisma";
 import { PrismaClient } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function PUT(req: NextRequest) {
   try {
-    const prisma = new PrismaClient();
+
     const { clubId, clubName, clubLeads } = await req.json();
     
     const club = await prisma.club.update({

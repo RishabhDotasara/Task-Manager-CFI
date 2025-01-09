@@ -1,4 +1,5 @@
 import { generateNotification } from "@/lib/notifications/serverFns";
+import { prisma } from "@/lib/prisma";
 import { PrismaClient, Status } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -7,7 +8,7 @@ export async function POST(request:NextRequest)
 {
     try 
     {
-        const prisma = new PrismaClient();
+  
         const body = await request.json();
 
         const task = await prisma.task.update({

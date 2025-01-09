@@ -1,3 +1,4 @@
+import { prisma } from "@/lib/prisma";
 import { PrismaClient } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -7,7 +8,7 @@ export async function DELETE(req:NextRequest)
 {
     try 
     {
-        const prisma = new PrismaClient();
+       
         const body = await req.json();
         const teamId = body.teamId;
         await prisma.team.delete({
@@ -15,7 +16,7 @@ export async function DELETE(req:NextRequest)
                 teamId:teamId
             }
         })
-        await prisma.$disconnect();
+       
         return NextResponse.json({message:"Team Deleted"},{status:200})
     }
     catch(err)

@@ -41,10 +41,7 @@ export function TeamTable({
 }: TeamTableProps) {
   return (
     <div className="space-y-4">
-      <TeamTableSearch onSearch={(value:string) => {
-        // Search functionality will be implemented by you
-        console.log(value);
-      }} />
+      
       
       <Table>
         <TableHeader>

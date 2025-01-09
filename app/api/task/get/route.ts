@@ -1,10 +1,10 @@
+import { prisma } from "@/lib/prisma";
 import { PrismaClient } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
-  const prisma = new PrismaClient();
 
   try {
     // Extract taskId from the query params
@@ -44,8 +44,5 @@ export async function GET(request: NextRequest) {
   } catch (err) {
     console.error("ERROR fetching task:", err);
     return NextResponse.json({ message: "Error fetching task" }, { status: 500 });
-  } finally {
-    // Ensure Prisma is properly disconnected
-    await prisma.$disconnect();
-  }
+  } 
 }

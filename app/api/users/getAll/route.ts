@@ -1,9 +1,10 @@
+import { prisma } from "@/lib/prisma";
 import { PrismaClient } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
   try {
-    const prisma = new PrismaClient();
+    
     const { searchParams } = new URL(request.url);
     const teamId = searchParams.get("teamId");
 
@@ -23,7 +24,7 @@ export async function GET(request: NextRequest) {
         members: true,
       },
     });
-    console.log(team);
+    
 
     const users = team?.members;
 

@@ -1,3 +1,4 @@
+import { prisma } from "@/lib/prisma";
 import { PrismaClient } from "@prisma/client";
 import { NextResponse } from "next/server";
 
@@ -5,7 +6,7 @@ export const dynamic = 'force-dynamic';
 
 export async function GET(request: Request) {
   try {
-    const prisma = new PrismaClient();
+    
     const {searchParams} = new URL(request.url);
     const employeeId = searchParams.get('employeeId');
 
@@ -40,11 +41,10 @@ export async function GET(request: Request) {
 
       if (!user)
       {
-        await prisma.$disconnect();
         return NextResponse.json({message: "User not found"}, {status: 404});
       }
 
-      await prisma.$disconnect();
+   
       return NextResponse.json({message:"Success!", user}, {status: 200});
     }
   } catch (err) {
