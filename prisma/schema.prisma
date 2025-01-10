@@ -31,13 +31,14 @@ model Session {
   title       String
   description String
   date        DateTime
-  startTime   DateTime
-  endTime     DateTime
+  startTime   String
+  endTime     String
   location    String    @default("Google Meet")
   teamId      String
   team        Team      @relation("session-relation-team", fields: [teamId], references: [teamId])
   eventType   EventType
 }
+
 model Club {
   clubId    String @id @default(uuid())
   clubName  String
@@ -123,6 +124,20 @@ model Notification {
 
   @@index([senderId])
   @@index([receiverId])
+}
+
+model ArchivedNotification {
+  notificationId Int              @id @default(autoincrement())
+  type           NotificationType
+  title          String
+  message        String
+  timestamp      DateTime         @default(now())
+  read           Boolean          @default(false)
+  actionUrl      String
+  requestType    RequestType?
+  toKeep         Boolean          @default(true)
+  senderIdentity String 
+  receiverIdentity String
 }
 
 enum RequestType {

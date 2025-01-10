@@ -7,6 +7,7 @@ import {
   NetworkIcon,
   PresentationIcon,
   Shield,
+  Tv2Icon,
 } from "lucide-react";
 import { FaPeopleCarry, FaTasks } from "react-icons/fa";
 import { ChatBubbleIcon } from "@radix-ui/react-icons";
@@ -67,6 +68,16 @@ export function NavigationLinks({
           Manage Admins
         </Link>
       )}
+
+      {/* {hasPermission(userPermissions, permissions.session.visible) && (
+        <Link
+          href="/session-scheduler"
+          className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
+        >
+          <Tv2Icon className={iconClassName} />
+          My Sessions
+        </Link>
+      )} */}
 
       {/* <Link
         href="/session-scheduler"
