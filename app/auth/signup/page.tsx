@@ -57,7 +57,15 @@ export default function SignUp() {
           description: "You can now login.",
         })
         router.push("/auth/signin")
-      } else {
+      } 
+      else if (response.status === 400) {
+        toast({
+          title: "User with this EmployeeId Already Exists!",
+          description: "Try Again.",
+        })
+        setLoading(false)
+      }
+      else {
         toast({
           title: "Error Creating User!",
           description: "Try Again.",

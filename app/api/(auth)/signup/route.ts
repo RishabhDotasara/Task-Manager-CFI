@@ -13,6 +13,17 @@ export async function POST(request:NextRequest)
         const employeeId =  body.employeeId.toLowerCase()
         const hashedPassword = await bcrypt.hash(body.password, 10)
 
+        const userExists = await prisma.user.findFirst({
+            where:{
+                employeeId:employeeId
+            }
+        })
+
+        if(userExists)
+        {
+            return NextResponse.json({message:"User Already Exists"}, {status:400})
+        }
+
         const user = await prisma.user.create({
             data:{
                 employeeId:employeeId,

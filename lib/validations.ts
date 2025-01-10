@@ -1,5 +1,5 @@
 import * as z from 'zod';
-import { Attendee } from '@/types/event';
+import { EventType } from '@prisma/client';
 
 export const eventFormSchema = z.object({
   title: z.string().min(2, {
@@ -15,8 +15,6 @@ export const eventFormSchema = z.object({
   endTime: z.string({
     required_error: 'End time is required.',
   }),
-  eventType: z.string({
-    required_error: 'Please select an event type.',
-  }),
+  eventType: z.enum([EventType.INPERSON, EventType.ONLINE]),
   location: z.string().optional(),
 });

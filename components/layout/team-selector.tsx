@@ -45,15 +45,15 @@ export function TeamSelector({
         <SelectContent>
           <SelectGroup>
             <SelectLabel>Select Team</SelectLabel>
-            {teams &&
-              teams.map((team: any) => {
+            {fetchQuery.data?.teams &&
+              fetchQuery.data?.teams.map((team: any) => {
                 return (
                   <SelectItem value={team.teamId} key={team.teamId}>
                     {team.name}
                   </SelectItem>
                 );
               })}
-            {teams && teams.length == 0 && (
+            {fetchQuery.data?.teams && fetchQuery.data?.teams.length == 0 && (
               <SelectItem value="No Teams Found!">No Teams Found!</SelectItem>
             )}
           </SelectGroup>

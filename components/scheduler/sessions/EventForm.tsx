@@ -4,11 +4,8 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { CalendarIcon, MapPinIcon, VideoIcon } from 'lucide-react';
 import { format } from 'date-fns';
-
-import { cn } from '@/lib/utils';
-
 import { Button } from '@/components/ui/button';
-import { Calendar } from '@/components/ui/calendar';
+
 import {
   Form,
   FormControl,
@@ -19,11 +16,6 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover';
-import {
   Select,
   SelectContent,
   SelectItem,
@@ -33,6 +25,12 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import type { z } from 'zod';
 import { eventFormSchema } from '@/lib/validations';
+import { useMutation } from '@tanstack/react-query';
+import { useToast } from '@/hooks/use-toast';
+import { useRecoilValue } from 'recoil';
+import { teamAtom } from '@/states/teamAtom';
+import { EventType } from '@prisma/client';
+import { useSession } from 'next-auth/react';
 
 interface EventFormProps {
   onSuccess?: () => void;
@@ -44,17 +42,56 @@ export function EventForm({ onSuccess }: EventFormProps) {
     defaultValues: {
       title: '',
       description: '',
-      eventType: 'online',
-      location: '',
+      eventType: EventType.INPERSON,
+      location: 'Video Conferencing',
       date: undefined, // Remove default date to ensure proper initialization
     },
   });
+  const currentTeamId = useRecoilValue(teamAtom)
 
   const watchEventType = form.watch('eventType');
+  const {toast} = useToast()
+  const session = useSession()
 
-  function onSubmit(values: z.infer<typeof eventFormSchema>) {
-    console.log(values);
-    onSuccess?.();
+  const createSessionMutation = useMutation({
+    mutationKey: ['create', 'session'],
+    mutationFn: async (data: z.infer<typeof eventFormSchema>) => {
+      const response = await fetch('/api/session/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      if (!response.ok) {
+        throw new Error('Failed to create session');
+      }
+      return response.json();
+    },
+    onError: ()=>{
+      toast({
+        title:"Error Creating Session",
+        description:" Please Try Again!",
+        variant:"destructive"
+      })
+    },
+    onSuccess: ()=>{
+      toast({
+        title:"Session Created Successfully!",
+        variant:"default"
+      })
+      if (onSuccess) onSuccess()
+    }
+  });
+
+  const onSubmit = async (data:any)=>{
+    if (!currentTeamId)
+    {
+      toast({
+        title:"Select a Team",
+        variant:"destructive"
+      })
+      return;
+    }
+    await createSessionMutation.mutate({...data, teamId:currentTeamId, creatorId:session.data?.userId})
   }
 
   return (
@@ -93,72 +130,19 @@ export function EventForm({ onSuccess }: EventFormProps) {
             control={form.control}
             name="date"
             render={({ field }) => (
-              <FormItem className="flex flex-col">
+              <FormItem className="flex flex-col justify-between">
                 <FormLabel>Date</FormLabel>
-                <Popover>
-                <PopoverTrigger asChild>
-                  <FormControl>
-                    <Button
-                      variant={"outline"}
-                      className={cn(
-                        "w-[240px] pl-3 text-left font-normal",
-                        !field.value && "text-muted-foreground"
-                      )}
-                    >
-                      {field.value ? (
-                        format(field.value, "PPP")
-                      ) : (
-                        <span>Pick a date</span>
-                      )}
-                      <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                    </Button>
-                  </FormControl>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={field.value}
-                    onSelect={field.onChange}
-                    disabled={(date) =>
-                      date > new Date() || date < new Date("1900-01-01")
-                    }
-                    initialFocus
-                  />
-                </PopoverContent>
-              </Popover>
-                {/* <Popover>
-                  <PopoverTrigger asChild>
-                    <FormControl>
-                      <Button
-                        variant="outline"
-                        className={cn(
-                          'w-full pl-3 text-left font-normal',
-                          !field.value && 'text-muted-foreground'
-                        )}
-                      >
-                        {field.value ? (
-                          format(field.value, 'PPP')
-                        ) : (
-                          <span>Pick a date</span>
-                        )}
-                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                      </Button>
-                    </FormControl>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={field.value}
-                      onSelect={field.onChange}
-                      initialFocus
-                      disabled={(date) => {
-                        const today = new Date();
-                        today.setHours(0, 0, 0, 0);
-                        return date < today;
-                      }}
-                    />
-                  </PopoverContent>
-                </Popover> */}
+                
+                <Input
+                  type="date"
+                  value={field.value ? format(field.value, 'yyyy-MM-dd') : ''}
+                  onChange={(e) => {
+                    field.onChange(e.target.value ? new Date(e.target.value) : undefined);
+                  }}
+                  onBlur={field.onBlur}
+                  name={field.name}
+                  ref={field.ref}
+                />
                 <FormMessage />
               </FormItem>
             )}
@@ -177,13 +161,13 @@ export function EventForm({ onSuccess }: EventFormProps) {
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    <SelectItem value="online">
+                    <SelectItem value={EventType.ONLINE}>
                       <div className="flex items-center">
                         <VideoIcon className="mr-2 h-4 w-4" />
                         Online Meeting
                       </div>
                     </SelectItem>
-                    <SelectItem value="inPerson">
+                    <SelectItem value={EventType.INPERSON}>
                       <div className="flex items-center">
                         <MapPinIcon className="mr-2 h-4 w-4" />
                         In-Person Meeting
@@ -227,7 +211,7 @@ export function EventForm({ onSuccess }: EventFormProps) {
           />
         </div>
 
-        {watchEventType === 'inPerson' && (
+        {watchEventType === EventType.INPERSON && (
           <FormField
             control={form.control}
             name="location"
