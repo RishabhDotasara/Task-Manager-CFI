@@ -44,10 +44,10 @@ interface TaskDialogProps {
   trigger: React.ReactNode
   triggerFunc: () => void
   tasks: Task[]
-  all: User[]
+  allUsers: User[]
 }
 
-export default function TaskDialog({ trigger, triggerFunc, tasks, all }: TaskDialogProps) {
+export default function TaskDialog({ trigger, triggerFunc, tasks, allUsers }: TaskDialogProps) {
   const [open, setOpen] = useState(false)
   const [isCreating, setIsCreating] = useState(false)
   const { toast } = useToast()
@@ -205,7 +205,7 @@ export default function TaskDialog({ trigger, triggerFunc, tasks, all }: TaskDia
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent className="bg-background">
-                      {all.map((user) => (
+                      {allUsers.map((user) => (
                         <SelectItem
                           key={user.userId}
                           value={user.userId}
@@ -214,6 +214,7 @@ export default function TaskDialog({ trigger, triggerFunc, tasks, all }: TaskDia
                           {user.username} | {user.employeeId}
                         </SelectItem>
                       ))}
+                      {!currentTeamId && <SelectItem value="unique">Select a team to assign tasks</SelectItem>}
                     </SelectContent>
                   </Select>
                   <FormMessage />
@@ -224,7 +225,7 @@ export default function TaskDialog({ trigger, triggerFunc, tasks, all }: TaskDia
             {form.watch("assignees").length > 0 && (
               <div className="flex flex-wrap gap-2">
                 {form.watch("assignees").map((userId:string) => {
-                  const user = all.find(u => u.userId === userId)
+                  const user = allUsers.find(u => u.userId === userId)
                   return (
                     <div
                       key={userId}

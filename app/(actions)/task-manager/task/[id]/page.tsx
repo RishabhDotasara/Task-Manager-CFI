@@ -98,7 +98,7 @@ export default function TaskDetails() {
       toast({ title: "Error while Commenting!" });
     },
     onSettled: (data: any) => {
-      setComments([...comments, data?.comment]);
+      queryClient.invalidateQueries({queryKey:["task", taskId]})
       toast({ title: "Comment Added!" });
       setIsAddingComment(false);
     },
@@ -221,7 +221,7 @@ export default function TaskDetails() {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            <CommentList comments={comments} isLoading={taskQuery.isLoading} />
+            <CommentList comments={taskQuery.data?.comments} isLoading={taskQuery.isLoading} />
           </div>
         </CardContent>
         <CardFooter>

@@ -29,7 +29,7 @@ export function CommentList({ comments, isLoading }: CommentListProps) {
     );
   }
 
-  if (comments && comments.length === 0) {
+  if ((comments && comments.length === 0) || !comments) {
     return <h1>No Comments</h1>;
   }
 
