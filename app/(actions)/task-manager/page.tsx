@@ -218,7 +218,7 @@ export default function HomePage() {
               trigger={<Button>Add Task</Button>}
               triggerFunc={fetchTasks}
               tasks={tasksQuery.data as Task[]}
-              all={usersQuery.data || []}
+              allUsers={usersQuery.data || []}
             />
           )}
         <ReloadButton onRefetch={tasksQuery.refetch} isRefetching={tasksQuery.isRefetching}/>

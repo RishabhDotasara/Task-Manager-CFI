@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
     });
 
     dataToCreateTasks.map(async (task:Task)=>{
-      await generateNotification({
+       generateNotification({
         title:`New Task`,
         message: `New Task Assigned: "${task.title}"`,
         actionUrl: "",

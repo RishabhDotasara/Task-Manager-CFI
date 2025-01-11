@@ -2,7 +2,10 @@
 import { EditClubSection } from "@/components/clubs/ClubDialog";
 import { ClubHeader } from "@/components/clubs/ClubHeader";
 import { TeamSection } from "@/components/clubs/TeamSection";
+import { DeletionConfirmationDialog } from "@/components/deleteDialog";
+import { ResourceError } from "@/components/error/resource-error";
 import { TeamForm } from "@/components/teams/TeamForm";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -13,12 +16,15 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import useAllUsersQuery from "@/hooks/use-allusers";
 import { useToast } from "@/hooks/use-toast";
-import { Team, User } from "@prisma/client";
+import { hasPermission, permissions } from "@/permissionManager/permissions";
+import { permissionAtom } from "@/states/permissionAtom";
+import { Club, Team, User } from "@prisma/client";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Settings2, Sheet, Sparkles, Users } from "lucide-react";
+import { Settings2, Sheet, Sparkles, Trash2, Users } from "lucide-react";
 import { useSession } from "next-auth/react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
+import { useRecoilValue } from "recoil";
 
 export default function ClubInfo() {
   const { id } = useParams();
@@ -31,6 +37,8 @@ export default function ClubInfo() {
   const queryClient = useQueryClient();
   const [isUpdating, setIsUpdating] = useState(false);
   const { allUsersQuery } = useAllUsersQuery();
+  const router = useRouter()
+  const userPermissions = useRecoilValue(permissionAtom)
 
   const handleDeleteTeam = async (teamId: string) => {
     try {
@@ -109,7 +117,7 @@ export default function ClubInfo() {
          const response = await fetch(`/api/clubs/get?clubId=${id}`)
          const data = await response.json()
          console.log(data)
-         return data.club
+         return data.club as Club
       }
       catch(err)
       {
@@ -146,10 +154,45 @@ export default function ClubInfo() {
     enabled: Boolean(page) || Boolean(limit)
   });
 
+  const deleteClubMutation = useMutation({
+    mutationKey:["delete club"],
+    mutationFn: async (clubId:string)=>{
+      const response = await fetch("/api/clubs/delete", {
+        body:JSON.stringify({
+          clubId:fetchClubQuery.data?.clubId
+        }),
+        headers:{
+          "Content-Type":"application/json"
+        },
+        method:"DELETE"
+      })
+      
+    },
+    onSuccess: ()=>{
+      toast({
+        title:"Club Deleted!",
+        description:"Please Console the members!",
+      })
+      router.push("/clubs-manager")
+    },
+    onError: ()=>{
+      toast({
+        title:"Failed to delete club!",
+        variant:"destructive",
+        description:"Try Again!"
+      })
+    }
+  })
+
 
   useEffect(() => {
     console.log(editingTeam);
   }, [editingTeam]);
+
+  if (!fetchClubQuery.data)
+  {
+    return <ResourceError onRetry={fetchClubQuery.refetch}/>
+  }
 
   return (
     <div className="container mx-auto p-4 space-y-6">
@@ -190,7 +233,7 @@ export default function ClubInfo() {
 
         <TabsContent value="settings" className="mt-6">
           <Card>
-            <CardHeader>
+            <CardHeader className="flex justify-between items-center flex-row">
               <div className="flex items-center gap-2">
                 <div className="bg-primary/10 p-2 rounded-full">
                   <Sparkles className="h-5 w-5 text-primary" />
@@ -202,6 +245,14 @@ export default function ClubInfo() {
                   </CardDescription>
                 </div>
               </div>
+              {hasPermission(userPermissions, permissions.admin.admin) && <DeletionConfirmationDialog
+                triggerText="Delete Club"
+                cancelText="Go Back"
+                confirmText="Erase Existence"
+                description="This can give existential crisis to club members and leaders. Are you sure?"
+                title="Delete Club"
+                onConfirm={()=>{deleteClubMutation.mutate(fetchClubQuery.data.clubId)}}
+              />     }         
             </CardHeader>
             <CardContent>
               <EditClubSection

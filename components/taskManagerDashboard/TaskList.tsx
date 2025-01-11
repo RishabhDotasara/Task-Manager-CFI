@@ -31,6 +31,11 @@ export default function TaskList({ tasks, isLoading }: TaskListProps) {
               No tasks match the selected filters
             </div>
           )}
+          {!tasks && (
+            <div  className="text-center text-muted-foreground py-8">
+              Select a Team to view Tasks
+            </div>
+          )}
           {tasks.map((task: Task) => (
             <li
               key={task.taskId}

@@ -29,10 +29,8 @@ export const dynamic = "force-dynamic";
  * 5. Returns an error response if there is an error during the update process.
  */
 
-
 export async function POST(request: NextRequest) {
   try {
-    
     const body = await request.json();
 
     // Update the team with the specified teamId
@@ -63,7 +61,7 @@ export async function POST(request: NextRequest) {
     }: { newMembers: string[]; newLeaders: string[]; promoterId: string } =
       body;
     newMembers.map(async (memberId: string) => {
-      await generateNotification({
+      generateNotification({
         title: "New Team",
         message: `You are now a part of the team "${team.name}"`,
         actionUrl: "",
@@ -75,7 +73,7 @@ export async function POST(request: NextRequest) {
     });
 
     newLeaders.map(async (leaderId: string) => {
-      await generateNotification({
+      generateNotification({
         title: "Team Leader",
         message: `You are now a Leader of the team "${team.name}"`,
         actionUrl: "",

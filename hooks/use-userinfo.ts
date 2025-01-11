@@ -39,7 +39,7 @@ export default function useUserInfo() {
               [...data.user.teamLeader],
               teamLeaderPermissions
             );
-            console.log("Generated Permissions: ", generatedPermissions);
+            // console.log("Generated Permissions: ", generatedPermissions);
             setPermissions([
               ...data.user.permissions,
               ...(generatedPermissions || []),
