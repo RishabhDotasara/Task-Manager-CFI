@@ -68,6 +68,7 @@ export default function ClubsPage() {
           </div>
         ) : (
           <div className="flex flex-wrap gap-6">
+            {filteredClubs?.length == 0 && <h1 className="text-muted-foreground">You aren't a leader of any Club.</h1>}
             {filteredClubs?.map((club: Club) => (
               <ClubCard
                 key={club.clubId}

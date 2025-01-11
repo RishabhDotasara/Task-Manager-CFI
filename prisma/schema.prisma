@@ -35,7 +35,7 @@ model Session {
   endTime     String
   location    String    @default("Google Meet")
   teamId      String
-  team        Team      @relation("session-relation-team", fields: [teamId], references: [teamId])
+  team        Team      @relation("session-relation-team", fields: [teamId], references: [teamId], onDelete: Cascade)
   eventType   EventType
 }
 
@@ -55,7 +55,7 @@ model Team {
   sessions Session[] @relation("session-relation-team")
   leaders  User[]    @relation("teamLeader")
   clubId   String
-  club     Club      @relation("clubTeam", fields: [clubId], references: [clubId])
+  club     Club      @relation("clubTeam", fields: [clubId], references: [clubId], onDelete: Cascade)
 }
 
 model Task {
@@ -127,16 +127,16 @@ model Notification {
 }
 
 model ArchivedNotification {
-  notificationId Int              @id @default(autoincrement())
-  type           NotificationType
-  title          String
-  message        String
-  timestamp      DateTime         @default(now())
-  read           Boolean          @default(false)
-  actionUrl      String
-  requestType    RequestType?
-  toKeep         Boolean          @default(true)
-  senderIdentity String 
+  notificationId   Int              @id @default(autoincrement())
+  type             NotificationType
+  title            String
+  message          String
+  timestamp        DateTime         @default(now())
+  read             Boolean          @default(false)
+  actionUrl        String
+  requestType      RequestType?
+  toKeep           Boolean          @default(true)
+  senderIdentity   String
   receiverIdentity String
 }
 

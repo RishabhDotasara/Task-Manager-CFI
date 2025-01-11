@@ -39,6 +39,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { taskFormSchema, TaskFormValues } from '@/lib/schemas/add-task-form-schema'
+import { useQueryClient } from '@tanstack/react-query'
 
 interface TaskDialogProps {
   trigger: React.ReactNode
@@ -65,6 +66,7 @@ export default function TaskDialog({ trigger, triggerFunc, tasks, allUsers }: Ta
       assignees: [],
     },
   })
+  const queryClient = useQueryClient()
 
   const onSubmit = async (values: TaskFormValues) => {
     try {
@@ -100,11 +102,12 @@ export default function TaskDialog({ trigger, triggerFunc, tasks, allUsers }: Ta
       }
 
       const data = await response.json()
-      console.log(data)
       
       toast({
         title: "Task Created Successfully!",
       })
+
+      queryClient.invalidateQueries({queryKey:["tasks", currentTeamId]})
       
       triggerFunc()
       setOpen(false)
