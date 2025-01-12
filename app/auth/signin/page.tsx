@@ -80,9 +80,9 @@ export default function Login() {
 
 
   useEffect(()=>{
-    if (session.status === "authenticated") {
-      router.push("/task-manager");
-    }
+    // if (session.status === "authenticated") {
+    //   router.push("/task-manager");
+    // }
   })
 
   return (

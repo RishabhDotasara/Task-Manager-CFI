@@ -22,6 +22,7 @@ import { NotificationPopover } from "@/components/notifications/NotificationPopO
 import { notificationAtom } from "@/states/notificationAtom";
 import { clubAtom } from "@/states/clubAtoms";
 import useUserInfo from "@/hooks/use-userinfo";
+import NotLoggedInMessage from "@/components/not-loggedin";
 
 export default function DashboardLayout({
   children,
@@ -39,14 +40,11 @@ export default function DashboardLayout({
   const [notifications, setNotifications] = useRecoilState(notificationAtom);
   const [userClubs, setuserClubs] = useRecoilState(clubAtom);
   const UserInfoQuery = useUserInfo()
+  const [isLoggedIn, setIsLoggedIn] = useState(true);
 
   useEffect(() => {
     if (session.status === "unauthenticated") {
-      router.push("/auth/signin");
-      toast({
-        title: "Please Login Again!",
-        description: "Session Expired!",
-      });
+      setIsLoggedIn(false);
     }
   }, [session.status]);
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
@@ -74,6 +72,14 @@ export default function DashboardLayout({
       });
     }
   };
+
+  if (!isLoggedIn)
+  {
+    return (
+      <NotLoggedInMessage/>
+    )
+  }
+
 
   return (
     <>
