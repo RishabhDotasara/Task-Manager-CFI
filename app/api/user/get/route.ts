@@ -24,12 +24,17 @@ export async function GET(request: Request)
                 employeeId: true,
                 permissions:true, 
                 teams:true,
-                teamLeader:true,
+                teamLeader:{
+                    include:{
+                        sessions:true
+                    }
+                },
                 clubLead:{
                     include:{
                         teams:true
                     }
-                }
+                },
+                
             },
         });
 

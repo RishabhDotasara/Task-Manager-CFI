@@ -29,22 +29,25 @@ import { useMutation } from '@tanstack/react-query';
 import { useToast } from '@/hooks/use-toast';
 import { useRecoilValue } from 'recoil';
 import { teamAtom } from '@/states/teamAtom';
-import { EventType } from '@prisma/client';
+import { EventType, Session } from '@prisma/client';
 import { useSession } from 'next-auth/react';
 
 interface EventFormProps {
   onSuccess?: () => void;
+  event:Session
 }
 
-export function EventForm({ onSuccess }: EventFormProps) {
+export function EventUpdationForm({ onSuccess, event }: EventFormProps) {
   const form = useForm<z.infer<typeof eventFormSchema>>({
     resolver: zodResolver(eventFormSchema),
     defaultValues: {
-      title: '',
-      description: '',
-      eventType: EventType.INPERSON,
-      location: 'Video Conferencing',
-      date: undefined, // Remove default date to ensure proper initialization
+      title: event.title,
+      description: event.description,
+      eventType: event.eventType,
+      location: event.location,
+      date: new Date(event.date), // Remove default date to ensure proper initialization
+      startTime:event.startTime,
+      endTime:event.endTime
     },
   });
   const currentTeamId = useRecoilValue(teamAtom)
@@ -53,29 +56,30 @@ export function EventForm({ onSuccess }: EventFormProps) {
   const {toast} = useToast()
   const session = useSession()
 
-  const createSessionMutation = useMutation({
-    mutationKey: ['create', 'session'],
+  const updateSessionMutation = useMutation({
+    mutationKey: ['update', 'sessionId:'+event.sessionId],
     mutationFn: async (data: z.infer<typeof eventFormSchema>) => {
-      const response = await fetch('/api/session/create', {
-        method: 'POST',
+      const response = await fetch(`/api/session/update?sessionId=${event.sessionId}`, {
+        method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
+        body: JSON.stringify({...data, creatorId:session.data?.userId}),
       });
       if (!response.ok) {
-        throw new Error('Failed to create session');
+        throw new Error('Failed to update session');
       }
       return response.json();
     },
     onError: ()=>{
       toast({
-        title:"Error Creating Session",
+        title:"Error Updating Session",
         description:" Please Try Again!",
         variant:"destructive"
       })
     },
     onSuccess: ()=>{
       toast({
-        title:"Session Created Successfully!",
+        title:"Session Updated Successfully!",
+        description:"Refresh to see changes.",
         variant:"default"
       })
       if (onSuccess) onSuccess()
@@ -91,7 +95,7 @@ export function EventForm({ onSuccess }: EventFormProps) {
       })
       return;
     }
-    await createSessionMutation.mutate({...data, teamId:currentTeamId, creatorId:session.data?.userId})
+    await updateSessionMutation.mutate({...data, teamId:currentTeamId, creatorId:session.data?.userId})
   }
 
   return (
@@ -118,7 +122,7 @@ export function EventForm({ onSuccess }: EventFormProps) {
             <FormItem>
               <FormLabel>Description</FormLabel>
               <FormControl>
-                <Textarea placeholder="Add event description..." {...field} maxLength={100}/>
+                <Textarea placeholder="Add event description..." {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -227,8 +231,8 @@ export function EventForm({ onSuccess }: EventFormProps) {
           />
         )}
 
-        <Button type="submit" className="w-full" disabled={createSessionMutation.isPending}>
-          Create Event {createSessionMutation.isPending && <Loader2 className='animate-spin h-4 w-4'/>}
+        <Button type="submit" className="w-full" disabled={updateSessionMutation.isPending}>
+          Update Details {updateSessionMutation.isPending && <Loader2 className='animate-spin h-4 w-4'/>}
         </Button>
       </form>
     </Form>
