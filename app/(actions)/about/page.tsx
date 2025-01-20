@@ -12,7 +12,7 @@ export default function AboutPage() {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="max-w-4xl mx-auto">
-        <div className="text-center mb-12">
+        {/* <div className="text-center mb-12">
           <h1 className="text-4xl font-bold mb-4">{APP_INFO.name}</h1>
           <p className="text-xl text-muted-foreground mb-6">
             Streamline your workflow, enhance productivity
@@ -26,9 +26,9 @@ export default function AboutPage() {
               </a>
             </Button>
           </div>
-        </div>
+        </div> */}
 
-        <AppStats />
+        {/* <AppStats /> */}
 
         <div className="mt-12 space-y-8">
           <div className="bg-card rounded-lg p-6">
@@ -53,7 +53,7 @@ export default function AboutPage() {
             </div>
           </div>
 
-          <div className="bg-card rounded-lg p-6">
+          {/* <div className="bg-card rounded-lg p-6">
             <h2 className="text-2xl font-semibold mb-4">Connect With Us</h2>
             <div className="flex gap-4">
               <Button variant="outline" className="gap-2">
@@ -65,7 +65,7 @@ export default function AboutPage() {
                 Contact Support
               </Button>
             </div>
-          </div>
+          </div> */}
 
           <Separator className="my-8" />
 

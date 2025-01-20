@@ -7,7 +7,6 @@ export async function POST(req:NextRequest)
     try 
     {
         const body = await req.json()
-        console.log(body)
         const session = await prisma.session.create({
             data:{
                 date:body.date,
