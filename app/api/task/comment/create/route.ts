@@ -2,6 +2,8 @@ import { generateNotification } from "@/lib/notifications/serverFns";
 import { prisma } from "@/lib/prisma";
 import { PrismaClient } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
+export const dynamic = "force-dynamic"
+
 
 export async function POST(request: NextRequest) {
   try {

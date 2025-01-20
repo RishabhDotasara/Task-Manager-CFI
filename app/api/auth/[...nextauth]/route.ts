@@ -5,6 +5,7 @@ import bcrypt from "bcryptjs";
 import { Session } from "next-auth";
 import { prisma } from "@/lib/prisma";
 
+export const dynamic = "force-dynamic";
 
 export interface UserSession extends Session {
   userId: string,

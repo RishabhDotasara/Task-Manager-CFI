@@ -6,23 +6,19 @@ import { useToast } from "@/hooks/use-toast";
 import { useRecoilState, useSetRecoilState } from "recoil";
 import { userAtom } from "@/states/userAtom";
 import { teamAtom } from "@/states/teamAtom";
-import { Bell, Menu } from "lucide-react";
+import { Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { ModeToggle } from "@/components/theme-toggle";
 import { NavigationLinks } from "@/components/layout/navigation-links";
 import { TeamSelector } from "@/components/layout/team-selector";
 import { UserMenu } from "@/components/layout/user-menu";
-import { useQuery } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools/build/modern/production.js";
 import { Club, Team, User } from "@prisma/client";
-import { permissionAtom } from "@/states/permissionAtom";
-import { getDynamicPermissions } from "@/permissionManager/permissions";
 import { NotificationPopover } from "@/components/notifications/NotificationPopOver";
-import { notificationAtom } from "@/states/notificationAtom";
-import { clubAtom } from "@/states/clubAtoms";
 import useUserInfo from "@/hooks/use-userinfo";
 import NotLoggedInMessage from "@/components/not-loggedin";
+import { SpeedInsights } from "@vercel/speed-insights/next"
 
 export default function DashboardLayout({
   children,

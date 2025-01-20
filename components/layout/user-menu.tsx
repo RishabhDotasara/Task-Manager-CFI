@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { CircleUser, Info, User } from "lucide-react";
 import { Role } from "@prisma/client";
+import { QuestionMarkCircledIcon } from "@radix-ui/react-icons";
 
 interface UserMenuProps {
   role?: Role;
@@ -57,6 +58,15 @@ export function UserMenu({ role, onLogout }: UserMenuProps) {
           >
             <User className="mr-2 h-4 w-4" />
             Profile
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link 
+            href="/profile"
+            className="flex items-center cursor-pointer"
+          >
+            <QuestionMarkCircledIcon className="mr-2 h-4 w-4" />
+            How To Use?
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem 

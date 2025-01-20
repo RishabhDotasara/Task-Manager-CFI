@@ -3,6 +3,8 @@ import { prisma } from "@/lib/prisma";
 import { PrismaClient, Status, Task } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 
+export const dynamic = "force-dynamic"
+
 interface ReturnTask {
   title:string,
   description:string,

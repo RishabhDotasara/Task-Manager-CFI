@@ -31,7 +31,7 @@ export function NotificationHeader({
           </p>
         </div>
         <div className="flex gap-2">
-          {unreadCount > 0 && (
+          {/* {unreadCount > 0 && (
             <Button
               variant="ghost"
               size="sm"
@@ -40,7 +40,7 @@ export function NotificationHeader({
             >
               Mark all read
             </Button>
-          )}
+          )} */}
           <ReloadButton onRefetch={refetch} isRefetching={isLoadingNotification}/>
         </div>
       </div>

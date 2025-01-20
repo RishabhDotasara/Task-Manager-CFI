@@ -2,12 +2,13 @@ import { prisma } from "@/lib/prisma";
 import { User } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 
+export const dynamic = "force-dynamic"
+
 export async function POST(req:NextRequest)
 {
     try 
     {
         const body = await req.json()
-        console.log(body)
         const session = await prisma.session.create({
             data:{
                 date:body.date,
