@@ -61,7 +61,7 @@ export async function POST(request: NextRequest) {
     }: { newMembers: string[]; newLeaders: string[]; promoterId: string } =
       body;
     newMembers.map(async (memberId: string) => {
-      await generateNotification({
+      generateNotification({
         title: "New Team",
         message: `You are now a part of the team "${team.name}"`,
         actionUrl: "",

@@ -37,8 +37,7 @@ export default function useUserInfo() {
             const generatedPermissions = await getDynamicPermissions(
               data.user.teams,
               [...data.user.teamLeader],
-              teamLeaderPermissions,
-              data.user
+              teamLeaderPermissions
             );
             // console.log("Generated Permissions: ", generatedPermissions);
             setPermissions([

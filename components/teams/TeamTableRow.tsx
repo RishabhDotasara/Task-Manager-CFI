@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState } from "react";
@@ -31,7 +32,7 @@ export default function TeamTableRow({
   const [isMembersDialogOpen, setIsMembersDialogOpen] = useState(false);
   const deleteTeamMutation = useDeleteTeam();
   const session = useSession();
-  const userPermissions = useRecoilValue(permissionAtom);
+  const userPermissions = useRecoilValue(permissionAtom)
 
   if (deleteTeamMutation.isSuccess) {
     return <TeamTableRowSkeleton />;
@@ -39,50 +40,43 @@ export default function TeamTableRow({
 
   return (
     <>
-      {team && team.members && team.leaders && (
-        <TableRow>
-          <TableCell>{team.name} </TableCell>
-          <TableCell>{team.members?.length} members</TableCell>
-          <TableCell>{team.leaders?.length} leaders</TableCell>
-          <TableCell>
-            <div className="flex space-x-2">
-              <TeamMembersDialog
-                team={team}
-                isOpen={isMembersDialogOpen}
-                onOpenChange={setIsMembersDialogOpen}
+      {team && team.members && team.leaders && <TableRow>
+        <TableCell>{team.name} </TableCell>
+        <TableCell>{team.members?.length} members</TableCell>
+        <TableCell>{team.leaders?.length} leaders</TableCell>
+        <TableCell>
+          <div className="flex space-x-2">
+            <TeamMembersDialog
+              team={team}
+              isOpen={isMembersDialogOpen}
+              onOpenChange={setIsMembersDialogOpen}
+            />
+
+            {(              hasPermission(userPermissions, permissions.team.update(team.teamId))) && (
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => onEdit(team)}
+              >
+                <Pencil className="h-4 w-4" />
+              </Button>
+            )}
+
+            {hasPermission(userPermissions, permissions.team.delete(team.teamId)) && (
+              <>
+             
+              <DeleteTeamDialog
+              teamName={team.name}
+                isOpen={isDeleteDialogOpen}
+                onOpenChange={setIsDeleteDialogOpen}
+                onDelete={() => deleteTeamMutation.mutate(team.teamId)}
+                isDeleting={deleteTeamMutation.isPending}
               />
-
-              {hasPermission(
-                userPermissions,
-                permissions.team.update(team.teamId)
-              ) && (
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={() => onEdit(team)}
-                >
-                  <Pencil className="h-4 w-4" />
-                </Button>
-              )}
-
-              {hasPermission(
-                userPermissions,
-                permissions.team.delete(team.teamId)
-              ) && (
-                <>
-                  <DeleteTeamDialog
-                    teamName={team.name}
-                    isOpen={isDeleteDialogOpen}
-                    onOpenChange={setIsDeleteDialogOpen}
-                    onDelete={() => deleteTeamMutation.mutate(team.teamId)}
-                    isDeleting={deleteTeamMutation.isPending}
-                  />
-                </>
-              )}
-            </div>
-          </TableCell>
-        </TableRow>
-      )}
+              </>
+            )}
+          </div>
+        </TableCell>
+      </TableRow>}
     </>
   );
 }

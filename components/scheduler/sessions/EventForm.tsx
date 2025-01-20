@@ -2,7 +2,7 @@
 
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { CalendarIcon, Loader2, MapPinIcon, VideoIcon } from 'lucide-react';
+import { CalendarIcon, MapPinIcon, VideoIcon } from 'lucide-react';
 import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
 
@@ -118,7 +118,7 @@ export function EventForm({ onSuccess }: EventFormProps) {
             <FormItem>
               <FormLabel>Description</FormLabel>
               <FormControl>
-                <Textarea placeholder="Add event description..." {...field} maxLength={100}/>
+                <Textarea placeholder="Add event description..." {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -227,8 +227,8 @@ export function EventForm({ onSuccess }: EventFormProps) {
           />
         )}
 
-        <Button type="submit" className="w-full" disabled={createSessionMutation.isPending}>
-          Create Event {createSessionMutation.isPending && <Loader2 className='animate-spin h-4 w-4'/>}
+        <Button type="submit" className="w-full">
+          Create Event
         </Button>
       </form>
     </Form>

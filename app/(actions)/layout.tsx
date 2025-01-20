@@ -31,6 +31,10 @@ export default function DashboardLayout({
   const [teams, setTeams] = useState<Team[] | null>(null);
   const setUser = useSetRecoilState(userAtom);
   const [currentTeam, setCurrentTeam] = useRecoilState(teamAtom);
+  const [isLoading, setIsLoading] = useState(false);
+  const [permission, setPermissions] = useRecoilState(permissionAtom);
+  const [notifications, setNotifications] = useRecoilState(notificationAtom);
+  const [userClubs, setuserClubs] = useRecoilState(clubAtom);
   const UserInfoQuery = useUserInfo()
   const [isLoggedIn, setIsLoggedIn] = useState(true);
 

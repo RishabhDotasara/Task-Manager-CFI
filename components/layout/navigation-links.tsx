@@ -69,7 +69,7 @@ export function NavigationLinks({
         </Link>
       )}
 
-      {hasPermission(userPermissions, permissions.session.visible) && (
+      {/* {hasPermission(userPermissions, permissions.session.visible) && (
         <Link
           href="/session-scheduler"
           className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
@@ -77,9 +77,28 @@ export function NavigationLinks({
           <Tv2Icon className={iconClassName} />
           My Sessions
         </Link>
-      )}
+      )} */}
 
-     
+      {/* <Link
+        href="/session-scheduler"
+        className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
+      >
+        <PresentationIcon className={iconClassName} />
+        Sessions
+      </Link */}
+
+      {/* <Link href="/leaderboard" className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary">
+        <List className={iconClassName} />
+        Leader Board
+      </Link>
+      <Link href="/chats" className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary">
+        <ChatBubbleIcon className={iconClassName} />
+        Chats
+      </Link>
+      <Link href="/documents" className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary">
+        <FileText className={iconClassName} />
+        Documents
+      </Link> */}
     </nav>
   );
 }
