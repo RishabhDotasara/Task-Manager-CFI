@@ -19,8 +19,8 @@
   "display": "standalone",
   "dir": "auto",
   "lang": "en-US",
-  "name": "CFI",
-  "short_name": "CFI",
-  "start_url": "http://localhost:3000/",
-  "description": "CFI Task Manager"
+  "name": "CFI Tasks",
+  "short_name": "CFI Tasks",
+  "start_url": "/",
+  "description": "Official CFI Task Manager"
 }
