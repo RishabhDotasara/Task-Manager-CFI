@@ -10,7 +10,7 @@ services:
       - .:/app
       - /app/node_modules
     environment:
-      DATABASE_URL: "postgres://admin:admin@database:5432/postgres"
+      DATABASE_URL: "postgresql://neondb_owner:BF3id9ZATbUS@ep-icy-brook-a5d6l1m7.us-east-2.aws.neon.tech/neondb?sslmode=require"
       NEXTAUTH_SECRET: "secret"
     depends_on:
       - database
