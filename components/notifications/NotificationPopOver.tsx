@@ -41,7 +41,7 @@ export function NotificationPopover() {
       </PopoverTrigger>
       <PopoverContent
         align="center"
-        className="w-full min-w-[400px] p-0 mr-4 h-fit"
+        className="md:w-[400px] w-[350px] p-0 mr-4 h-fit"
         sideOffset={8}
       >
         {!isError && (

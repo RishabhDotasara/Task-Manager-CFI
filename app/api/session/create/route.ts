@@ -7,12 +7,12 @@ export async function POST(req:NextRequest)
     try 
     {
         const body = await req.json()
-        console.log(body)
+        // console.log(body)
         const session = await prisma.session.create({
             data:{
                 date:body.date,
                 description:body.description,
-                endTime:body.endTime,
+                endTime:body.endTime,   
                 eventType:body.eventType,
                 startTime:body.startTime,
                 title:body.title,

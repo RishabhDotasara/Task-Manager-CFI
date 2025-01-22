@@ -3,8 +3,6 @@
 import { Github, Mail, Twitter } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { APP_INFO } from '@/lib/constants/app-info'
-import { FeatureRequestDialog } from '@/components/about/FeatureRequestDialog'
-import { AppStats } from '@/components/about/AppStats'
 import { Separator } from '@radix-ui/react-dropdown-menu'
 
 
@@ -12,7 +10,7 @@ export default function AboutPage() {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="max-w-4xl mx-auto">
-        <div className="text-center mb-12">
+        {/* <div className="text-center mb-12">
           <h1 className="text-4xl font-bold mb-4">{APP_INFO.name}</h1>
           <p className="text-xl text-muted-foreground mb-6">
             Streamline your workflow, enhance productivity
@@ -28,7 +26,7 @@ export default function AboutPage() {
           </div>
         </div>
 
-        <AppStats />
+        <AppStats /> */}
 
         <div className="mt-12 space-y-8">
           <div className="bg-card rounded-lg p-6">

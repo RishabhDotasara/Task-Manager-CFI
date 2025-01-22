@@ -35,9 +35,9 @@ export function TeamSelector({
   fetchQuery,
 }: TeamSelectorProps) {
   return (
-    <div className="flex gap-2">
+    <div className="flex gap-2 justify-between w-full">
       <Select onValueChange={onTeamChange} value={currentTeam}>
-        <SelectTrigger className="w-[180px]">
+        <SelectTrigger className="w-full">
           <SelectValue
             placeholder={fetchQuery.isLoading || fetchQuery.isRefetching ? "Loading Teams..." : "Select a Team"}
           />

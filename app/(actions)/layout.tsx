@@ -23,6 +23,7 @@ import { notificationAtom } from "@/states/notificationAtom";
 import { clubAtom } from "@/states/clubAtoms";
 import useUserInfo from "@/hooks/use-userinfo";
 import NotLoggedInMessage from "@/components/not-loggedin";
+import NavigationButtons from "@/components/navigation-buttons/NavigationButtons";
 
 export default function DashboardLayout({
   children,
@@ -145,6 +146,7 @@ export default function DashboardLayout({
             <UserMenu onLogout={handleLogOut} />
           </header>
           <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6 bg-background">
+            <NavigationButtons/>
             <div className="flex flex-1 justify-center rounded-lg shadow-sm">
               {children}
             </div>
