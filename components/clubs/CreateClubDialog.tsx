@@ -44,7 +44,8 @@ export function CreateClubDialog({}: CreateTeamDialogProps) {
       });
       setcreatingClubName("");
       setOpen(false);
-      queryClient.invalidateQueries({ queryKey: ["teams", "all"] });
+      queryClient.invalidateQueries({ queryKey: ["user",
+  "178df444-b42d-4678-9d9f-75cd5bfeaefa"] });
     },
     onError: (err) => {
       console.log(err);

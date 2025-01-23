@@ -52,7 +52,7 @@ export function CreateTeamDialog({clubId}: CreateTeamDialogProps) {
       });
       setCreatingTeamName("");
       setOpen(false);
-      queryClient.invalidateQueries({ queryKey: ["teams", "all"] });
+      queryClient.invalidateQueries({ queryKey: ["teams", "clubId:"+clubId] });
     },
     onError: (err) => {
       console.log(err);

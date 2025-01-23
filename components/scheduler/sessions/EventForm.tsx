@@ -25,7 +25,7 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import type { z } from 'zod';
 import { eventFormSchema } from '@/lib/validations';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useToast } from '@/hooks/use-toast';
 import { useRecoilValue } from 'recoil';
 import { teamAtom } from '@/states/teamAtom';
@@ -52,6 +52,7 @@ export function EventForm({ onSuccess }: EventFormProps) {
   const watchEventType = form.watch('eventType');
   const {toast} = useToast()
   const session = useSession()
+  const queryClient = useQueryClient()
 
   const createSessionMutation = useMutation({
     mutationKey: ['create', 'session'],
@@ -78,6 +79,7 @@ export function EventForm({ onSuccess }: EventFormProps) {
         title:"Session Created Successfully!",
         variant:"default"
       })
+      queryClient.invalidateQueries({queryKey:["sessions", `teamId:${currentTeamId}`]})
       if (onSuccess) onSuccess()
     }
   });

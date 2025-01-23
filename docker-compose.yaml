@@ -10,7 +10,7 @@ services:
       - .:/app
       - /app/node_modules
     environment:
-      DATABASE_URL: "postgresql://admin:admin@localhost:5432/postgres"
+      DATABASE_URL: "postgresql://admin:admin@database:5432/postgres"
       NEXTAUTH_SECRET: "secret"
     depends_on:
       - database

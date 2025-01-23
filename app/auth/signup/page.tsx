@@ -1,15 +1,15 @@
-"use client"
+"use client";
 
-import Image from "next/image"
-import Link from "next/link"
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { Loader } from 'lucide-react'
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
+import Image from "next/image";
+import Link from "next/link";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Loader } from "lucide-react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
 
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Form,
   FormControl,
@@ -17,19 +17,18 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form"
-import { useToast } from "@/hooks/use-toast"
-import { SignUpFormValues, signUpSchema } from "@/types/signUpTypes"
-import { defaultPermissions } from "@/permissionManager/permissions"
-
+} from "@/components/ui/form";
+import { useToast } from "@/hooks/use-toast";
+import { SignUpFormValues, signUpSchema } from "@/types/signUpTypes";
+import { signIn } from "next-auth/react";
 
 export const description =
-  "A signup page with two columns. The first column has the signup form with employee ID, username, email, and password. There's a link to sign in if you already have an account. The second column has a cover image."
+  "A signup page with two columns. The first column has the signup form with employee ID, username, email, and password. There's a link to sign in if you already have an account. The second column has a cover image.";
 
 export default function SignUp() {
-  const [loading, setLoading] = useState(false)
-  const router = useRouter()
-  const { toast } = useToast()
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
+  const { toast } = useToast();
 
   const form = useForm<SignUpFormValues>({
     resolver: zodResolver(signUpSchema),
@@ -38,45 +37,48 @@ export default function SignUp() {
       username: "",
       email: "",
       password: "",
-      permissions: []
+      permissions: [],
     },
-  })
+  });
 
   const createUser = async (values: SignUpFormValues) => {
     try {
-      setLoading(true)
+      setLoading(true);
       const response = await fetch("/api/signup", {
         method: "POST",
         body: JSON.stringify(values),
-      })
+      });
 
       if (response.status === 200) {
-        setLoading(false)
+        setLoading(false);
         toast({
           title: "User Created!",
-          description: "You can now login.",
-        })
-        router.push("/auth/signin")
-      } 
-      else if (response.status === 400) {
+          description: "Logging you In!",
+        });
+        await signIn("credentials", {
+          redirect: false,
+          employeeId: values.employeeId,
+          password: values.password,
+        });
+        router.push("/task-manager");
+      } else if (response.status === 400) {
         toast({
           title: "User with this EmployeeId Already Exists!",
           description: "Try Again.",
-        })
-        setLoading(false)
-      }
-      else {
+        });
+        setLoading(false);
+      } else {
         toast({
           title: "Error Creating User!",
           description: "Try Again.",
-        })
-        setLoading(false)
+        });
+        setLoading(false);
       }
     } catch (err) {
-      setLoading(false)
-      console.log("Error in server!")
+      setLoading(false);
+      console.log("Error in server!");
     }
-  }
+  };
 
   return (
     <div className="w-full lg:grid lg:min-h-[600px] lg:grid-cols-2 xl:min-h-[800px]">
@@ -86,7 +88,10 @@ export default function SignUp() {
             <h1 className="text-3xl font-bold">Signup</h1>
           </div>
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(createUser)} className="grid gap-4">
+            <form
+              onSubmit={form.handleSubmit(createUser)}
+              className="grid gap-4"
+            >
               <FormField
                 control={form.control}
                 name="employeeId"
@@ -120,7 +125,11 @@ export default function SignUp() {
                   <FormItem>
                     <FormLabel>Email</FormLabel>
                     <FormControl>
-                      <Input type="email" placeholder="you@example.com" {...field} />
+                      <Input
+                        type="email"
+                        placeholder="you@example.com"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -133,7 +142,11 @@ export default function SignUp() {
                   <FormItem>
                     <FormLabel>Password</FormLabel>
                     <FormControl>
-                      <Input type="password" placeholder="********" {...field} />
+                      <Input
+                        type="password"
+                        placeholder="********"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -162,6 +175,5 @@ export default function SignUp() {
         />
       </div>
     </div>
-  )
+  );
 }
-

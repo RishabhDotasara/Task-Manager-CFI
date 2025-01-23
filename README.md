@@ -25,7 +25,7 @@
 To run this project, you will need to add the following environment variables to your `.env` file:
 
 ```plaintext
-DATABASE_URL=postgresql://admin:admin@localhost:5432/teamify
+DATABASE_URL=postgresql://admin:admin@localhost:5432/postgres
 NEXTAUTH_URL=http://localhost:3000
 NEXTAUTH_SECRET=your-secret-key
 ```
