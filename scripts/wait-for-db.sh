@@ -9,7 +9,7 @@ echo "PostgreSQL is ready!"
 
 # Run Prisma migrations
 echo "Running Prisma migrations..."
-npx prisma migrate dev --name "init"# or use `migrate deploy` for production
+npx prisma migrate deploy
 if [ $? -ne 0 ]; then
   echo "Prisma migration failed!"
   exit 1

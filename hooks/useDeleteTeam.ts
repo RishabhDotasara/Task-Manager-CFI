@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useToast } from '@/hooks/use-toast'
 
-export function useDeleteTeam() {
+export function useDeleteTeam({clubId}:{clubId:string}) {
   const { toast } = useToast()
   const queryClient = useQueryClient()
 
@@ -24,7 +24,7 @@ export function useDeleteTeam() {
     mutationKey: ['deleteTeam'],
     mutationFn: deleteTeam,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['teams', 'all'] })
+      queryClient.invalidateQueries({ queryKey: ['teams', `clubId:${clubId}`] })
       toast({
         title: 'Team Deleted!',
         description: 'All members and leaders have been removed from the team!',

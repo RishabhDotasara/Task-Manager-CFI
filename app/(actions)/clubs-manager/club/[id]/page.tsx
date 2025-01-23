@@ -189,7 +189,7 @@ export default function ClubInfo() {
     console.log(editingTeam);
   }, [editingTeam]);
 
-  if (!fetchClubQuery.data)
+  if (fetchClubQuery.isError || fetchClubTeamsQuery.isError)
   {
     return <ResourceError onRetry={fetchClubQuery.refetch}/>
   }

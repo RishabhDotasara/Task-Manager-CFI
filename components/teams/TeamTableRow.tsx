@@ -29,11 +29,11 @@ export default function TeamTableRow({
 }: RowProps) {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isMembersDialogOpen, setIsMembersDialogOpen] = useState(false);
-  const deleteTeamMutation = useDeleteTeam();
+  const deleteTeamMutation = useDeleteTeam({clubId:team.clubId});
   const session = useSession();
   const userPermissions = useRecoilValue(permissionAtom);
 
-  if (deleteTeamMutation.isSuccess) {
+  if (deleteTeamMutation.isPending)  {
     return <TeamTableRowSkeleton />;
   }
 

@@ -4,6 +4,7 @@ import { Github, Mail, Twitter } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { APP_INFO } from '@/lib/constants/app-info'
 import { Separator } from '@radix-ui/react-dropdown-menu'
+import Link from 'next/link'
 
 
 export default function AboutPage() {
@@ -45,8 +46,10 @@ export default function AboutPage() {
                 <p className="font-medium">{APP_INFO.developer}</p>
               </div>
               <div>
-                <p className="text-muted-foreground">Maintainer</p>
-                <p className="font-medium">{APP_INFO.maintainer}</p>
+                <p className="text-muted-foreground ">Creator & Maintainer</p>
+                <p className="font-medium">{APP_INFO.maintainer} 
+                  <Link href={"#"}>LinkedIn</Link>
+                </p>
               </div>
             </div>
           </div>
