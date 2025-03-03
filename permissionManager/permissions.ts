@@ -28,6 +28,9 @@ export const permissions = {
     visible:"session:visible",
     update: (teamId:string) => `session:update:${teamId}`,
     delete: (teamId:string) => `session:delete:${teamId}`
+  },
+  chat:{
+    visible:"chat:visible",
   }
 };
 
@@ -48,7 +51,8 @@ export const defaultPermissions = (teamIds: string[], clubIds: string[] = []) =>
     permissions.task.read(teamId),
     permissions.task.update(teamId),
     permissions.team.read(teamId),
-    permissions.session.visible
+    permissions.session.visible,
+    permissions.chat.visible
   ]),
   TEAMLEADER: teamIds.flatMap((teamId) => [
     permissions.task.delete(teamId),

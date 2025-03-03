@@ -21,7 +21,7 @@ export function SessionsTab() {
     <div className="container mx-auto py-6 space-y-8">
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight flex gap-2 items-center">
+          <h2 className="text-3xl font-bold tracking-tight text-primary flex gap-2 items-center">
           
             Sessions</h2>
           <p className="text-muted-foreground">

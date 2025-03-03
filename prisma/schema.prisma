@@ -22,6 +22,8 @@ model User {
   clubLead              Club[]         @relation("clubLead")
   sentNotification      Notification[] @relation("SentNotifications")
   recievedNotifications Notification[] @relation("ReceivedNotifications")
+  sentMessages          Message[]      @relation("sentMessages")
+  receivedMessages      Message[]      @relation("receivedMessages")
 
   @@index([employeeId])
 }
@@ -85,8 +87,11 @@ model Comment {
 
 model Message {
   id        Int      @id @default(autoincrement())
-  content   String
-  sender    String
+  senderId String 
+  receiverId String
+  content String 
+  sender   User   @relation("sentMessages", fields: [senderId], references: [userId])
+  receiver User   @relation("receivedMessages", fields: [receiverId], references: [userId])
   createdAt DateTime @default(now())
 }
 
